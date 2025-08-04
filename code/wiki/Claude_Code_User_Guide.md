@@ -125,9 +125,8 @@ source ~/.bashrc
 
 ### Basic Environment Setup
 
-1. **Create Working Directory**
+1. **Cd to your Working Directory**
 ```bash
-mkdir my-first-project
 cd my-first-project
 ```
 
