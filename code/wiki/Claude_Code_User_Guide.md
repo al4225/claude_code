@@ -22,13 +22,13 @@
 
 ### 🚀 High‑Level Features & Powers
 
-| Capabilities | Explained |
-| --- | --- |
-| **Build from description** | Write something like *“create a calculator app that adds two numbers”* and Claude Code drafts files, functions, and commits automatically. |
-| **Debug & fix code** | Ask it to fix a bug or interpret an error message and it edits the code to resolve issues. |
-| **Understand your project** | It reads file structure and dependencies, so you don’t have to manually select context files. It can even integrate docs and Slack/GDrive via the **Model Context Protocol (MCP)** [Tom's Guide](https://www.tomsguide.com/ai/anthropic-is-putting-a-limit-on-a-claude-ai-feature-because-people-are-using-it-24-7?utm_source=chatgpt.com). |
-| **Automate repetitive tasks** | From linting to release notes, it runs commands like writing docs or fixing typos automatically. |
-| **Safety first** | Claude Code always asks for permission before modifying files; you can customize an allow‑list for trusted tools [Anthropic](https://docs.anthropic.com/en/docs/claude-code/overview). |
+| Capability                    | Description                                                                 |
+|------------------------------|-----------------------------------------------------------------------------|
+| **Native Terminal Integration** | Works directly in the terminal—no external server or complex setup required. |
+| **Understands Entire Codebase** | After `cd` into a folder, Claude Code analyzes project structure and logic automatically. |
+| **Natural Language Interaction** | Supports English and other languages. Simply describe your intent—Claude answers, writes, or modifies code accordingly. |
+| **Privacy-Conscious Design** | Connects directly to Anthropic’s API with no intermediaries. Always asks for permission before modifying files. |
+| **Real Execution Power**      | Goes beyond suggestions—can run code, debug, edit files, handle Git operations, and automate developer tasks. |
 
 Think of it as your programming partner that understands your needs and helps you complete programming tasks!
 
