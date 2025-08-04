@@ -285,6 +285,7 @@ A: Simply tell Claude Code about the error you're facing, and it will help analy
 
 ### Q: What is the cost & rate‑limits?
 A: Claude Code usage consumes tokens. Some high‑usage users have hit weekly caps even under the $200/month Max plan, and Anthropic is enforcing new limits beginning August 28, 2025
+
 ---
 
 ## Video Tutorial
