@@ -126,7 +126,7 @@ cd my-first-project
 
 2. **Start Claude Code**
 ```bash
-claude-code
+claude
 ```
 
 3. **Basic Interaction Example**
@@ -145,14 +145,17 @@ Hello World
 ```
 
 ## Core Features Demo
-claude → cd ~your-folder/ → /init
 
 ### 1. Code Explanation
 ```bash
 # Test command
 Please explain how the code in mwe/calculator.py works
 ```
-
+OR One-time non-interactive execution: Execute a prompt directly, print the result, and exit: 
+```bash
+# In the terminal outside claude
+claude -p "Please explain how the code in mwe/calculator.py works" 
+```
 ### 2. Debugging
 ```bash
 # Test command
