@@ -15,7 +15,7 @@
 
 ### 🎓 What is Claude Code and Why It Exists
 
-- **Claude** is Anthropic’s powerful AI model, designed to understand language, logic, math, and code more deeply than typical chatbots. Its latest version, **Claude Opus 4**, released on **May 22 2025**, is especially strong at multi‑step reasoning and large‑codebase tasks (e.g. coding), scoring high on software‑engineering benchmarks [Tom's Guide](https://www.tomsguide.com/ai/anthropic-is-putting-a-limit-on-a-claude-ai-feature-because-people-are-using-it-24-7?utm_source=chatgpt.com).
+- **Claude** is Anthropic’s powerful AI model, designed to understand language, logic, math, and code more deeply than typical chatbots. Its latest version, **Claude Opus 4**, released on **May 22 2025**, is especially strong at multi‑step reasoning and large‑codebase tasks (e.g. coding), scoring high on software‑engineering benchmarks.
 - **Claude Code** is a terminal‑based assistant that uses Claude Opus 4 or Sonnet 4 to help developers *write*, *debug*, *navigate*, and *refactor* code directly from the command line. It comes fully integrated with Git, test systems, and other tools you already use [Anthropic](https://docs.anthropic.com/en/docs/claude-code/overview).
 
 ---
