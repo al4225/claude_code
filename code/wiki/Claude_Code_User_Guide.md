@@ -108,7 +108,7 @@ npm install -g @anthropic-ai/claude-code
 claude-code --version
 ```
 
-### Setting Up API Key
+### Setting Up API Key (OR just use Claude account with subscription)
 ```bash
 # Get API key from: https://console.anthropic.com/
 # Set environment variable
