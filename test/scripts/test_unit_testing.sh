@@ -1,0 +1,22 @@
+#!/bin/bash
+# Test script for unit testing feature
+
+echo "=== Testing Unit Test Generation Feature ==="
+echo "Command: claude-code \"Write comprehensive unit tests for mwe/calculator.py using pytest framework, save as mwe/test_calculator.py\""
+echo ""
+echo "Expected behavior:"
+echo "- Claude Code will create test_calculator.py"
+echo "- Use pytest framework"
+echo "- Include tests for:"
+echo "  * add() function with various inputs"
+echo "  * subtract() function with various inputs"
+echo "  * calculate() function with valid operations"
+echo "  * Error handling for invalid operations"
+echo "- Follow pytest conventions"
+echo "- Include edge cases"
+echo ""
+echo "To run this test:"
+echo "claude-code \"Write comprehensive unit tests for mwe/calculator.py using pytest framework, save as mwe/test_calculator.py\""
+echo ""
+echo "Then run the tests with:"
+echo "claude-code \"Run the tests in mwe/test_calculator.py\""

@@ -1,0 +1,120 @@
+CLAUDE CODE CHEATSHEET
+======================
+
+INSTALLATION
+------------
+npm install -g @anthropic-ai/claude-code
+export ANTHROPIC_API_KEY="your-key"
+claude-code
+
+BASIC COMMANDS
+--------------
+Start Claude Code:     claude-code
+Exit:                  Ctrl+D or /exit
+Clear screen:          Ctrl+L or /clear
+Help:                  /help
+
+FILE OPERATIONS
+---------------
+Create file:           "Create a Python file called app.py"
+Edit file:             "Add error handling to app.py"
+Read file:             "Show me what's in config.json"
+Delete file:           "Delete temp.txt"
+
+CODE OPERATIONS
+---------------
+Run code:              "Run app.py"
+Debug:                 "Debug the error in line 42"
+Test:                  "Run the tests"
+Explain:               "Explain how this function works"
+
+GIT COMMANDS
+------------
+Status:                "Show git status"
+Commit:                "Commit changes with message 'Fix bug'"
+Push:                  "Push to main branch"
+Create branch:         "Create feature branch"
+
+COMMON TASKS
+------------
+# Code Generation
+"Create a REST API with Express.js"
+"Write a function to validate email addresses"
+"Generate a React component for user profile"
+
+# Debugging
+"Fix the TypeError in auth.js"
+"Why is my function returning undefined?"
+"Debug the infinite loop in process_data()"
+
+# Code Review
+"Review my code for security issues"
+"Suggest performance improvements"
+"Check for best practices"
+
+# Documentation
+"Generate API docs for all endpoints"
+"Add comments to explain this algorithm"
+"Create a README file"
+
+# Testing
+"Write unit tests for Calculator class"
+"Create integration tests for API"
+"Test edge cases for input validation"
+
+QUERY FORMATS
+-------------
+Specific:    "Fix TypeError in line 42 of user.py"
+Context:     "Add JWT auth to my Express API using existing User model"
+Structured:  "Goal: Add file upload. Requirements: <10MB, images only"
+
+SHORTCUTS
+---------
+Edit:        /e
+Run:         /r  
+Save:        /s
+Git:         /g
+Help:        /h
+
+BEST PRACTICES
+--------------
+1. Be specific: "Fix login error" → "Fix 'undefined user' error in login function"
+2. Provide context: Mention framework, language version, existing code
+3. Plan first: "Help me plan user auth" before "Implement user auth"
+4. Iterate: Start simple, then add features
+5. Review: Always ask for code review after implementation
+
+WORKFLOW EXAMPLE
+----------------
+1. claude-code
+2. "Create a Python web scraper for news articles"
+3. "Add error handling and retry logic"
+4. "Write tests for the scraper"
+5. "Review the code for improvements"
+6. "Generate documentation"
+
+ERROR REPORTING
+---------------
+Bad:  "It doesn't work"
+Good: "Getting 'KeyError: user_id' in get_profile() line 23 when user is logged in"
+
+ADVANCED TIPS
+-------------
+- Chain commands: /edit main.py && /run python main.py
+- Use wildcards: "Delete all *.tmp files"
+- Background tasks: "Run server.py in background"
+- Custom commands: Add to .claude-code/commands.json
+
+QUICK TEMPLATES
+---------------
+Bug: "Error: [message], File: [name], Line: [number], When: [action]"
+Feature: "Add [feature] that [does X] when [condition]"
+Optimize: "Make [function] faster. Currently: [Xs], Target: [Ys]"
+
+REMEMBER
+--------
+- Natural language works best
+- Provide examples when asking for specific output
+- Use iterative approach for complex tasks
+- Don't hesitate to ask for explanations
+- Claude Code runs locally - your code is safe

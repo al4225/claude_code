@@ -1,0 +1,26 @@
+Claude Code Demo Script
+======================
+
+1. Installation
+   $ npm install -g @anthropic-ai/claude-code
+   $ export ANTHROPIC_API_KEY='your-key'
+   $ claude-code --version
+
+2. Basic Usage
+   $ claude-code
+   > Create a Python hello world program
+   [Claude creates hello.py]
+
+3. Code Explanation
+   > Explain the code in calculator.py
+   [Claude explains the code structure]
+
+4. Debugging
+   > Help me debug my code
+   [Claude identifies and fixes errors]
+
+5. Git Integration
+   > Commit my changes
+   [Claude handles git operations]
+
+For the full animated demo, see demo_animation.gif

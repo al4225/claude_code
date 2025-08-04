@@ -1,0 +1,20 @@
+#!/bin/bash
+# Test script for documentation generation feature
+
+echo "=== Testing Documentation Generation Feature ==="
+echo "Command: claude-code \"Generate comprehensive API documentation for all Python files in the mwe directory, save as mwe/API_DOCUMENTATION.md\""
+echo ""
+echo "Expected behavior:"
+echo "- Claude Code will analyze all Python files in mwe/"
+echo "- Generate markdown documentation including:"
+echo "  * Module descriptions"
+echo "  * Class documentation"
+echo "  * Function signatures and descriptions"
+echo "  * Parameter details"
+echo "  * Return value information"
+echo "  * Usage examples"
+echo "- Format in clean, readable markdown"
+echo "- Save as mwe/API_DOCUMENTATION.md"
+echo ""
+echo "To run this test:"
+echo "claude-code \"Generate comprehensive API documentation for all Python files in the mwe directory, save as mwe/API_DOCUMENTATION.md\""
