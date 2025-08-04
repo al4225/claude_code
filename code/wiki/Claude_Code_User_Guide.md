@@ -13,14 +13,22 @@
 
 ## Introduction
 
-### What is Claude Code?
-Claude Code is a powerful AI programming assistant that helps you:
-- 🤖 Understand and explain code
-- 🐛 Debug and fix errors
-- ✏️ Write and edit code
-- 📁 Directly manipulate the file system
-- 🔄 Use Git for version control
-- 📊 Generate charts and documentation
+### 🎓 What is Claude Code and Why It Exists
+
+- **Claude** is Anthropic’s powerful AI model, designed to understand language, logic, math, and code more deeply than typical chatbots. Its latest version, **Claude Opus 4**, released on **May 22 2025**, is especially strong at multi‑step reasoning and large‑codebase tasks (e.g. coding), scoring high on software‑engineering benchmarks [Tom's Guide](https://www.tomsguide.com/ai/anthropic-is-putting-a-limit-on-a-claude-ai-feature-because-people-are-using-it-24-7?utm_source=chatgpt.com).
+- **Claude Code** is a terminal‑based assistant that uses Claude Opus 4 or Sonnet 4 to help developers *write*, *debug*, *navigate*, and *refactor* code directly from the command line. It comes fully integrated with Git, test systems, and other tools you already use [Anthropic](https://docs.anthropic.com/en/docs/claude-code/overview).
+
+---
+
+### 🚀 High‑Level Features & Powers
+
+| Capabilities | Explained |
+| --- | --- |
+| **Build from description** | Write something like *“create a calculator app that adds two numbers”* and Claude Code drafts files, functions, and commits automatically. |
+| **Debug & fix code** | Ask it to fix a bug or interpret an error message and it edits the code to resolve issues. |
+| **Understand your project** | It reads file structure and dependencies, so you don’t have to manually select context files. It can even integrate docs and Slack/GDrive via the **Model Context Protocol (MCP)** [Tom's Guide](https://www.tomsguide.com/ai/anthropic-is-putting-a-limit-on-a-claude-ai-feature-because-people-are-using-it-24-7?utm_source=chatgpt.com). |
+| **Automate repetitive tasks** | From linting to release notes, it runs commands like writing docs or fixing typos automatically. |
+| **Safety first** | Claude Code always asks for permission before modifying files; you can customize an allow‑list for trusted tools [Anthropic](https://docs.anthropic.com/en/docs/claude-code/overview). |
 
 Think of it as your programming partner that understands your needs and helps you complete programming tasks!
 
@@ -271,6 +279,8 @@ A: Claude Code runs locally, your code is not uploaded to the cloud (unless you 
 ### Q: What to do when encountering errors?
 A: Simply tell Claude Code about the error you're facing, and it will help analyze and solve it.
 
+### What is the cost & rate‑limits?
+A: Claude Code usage consumes tokens. Some high‑usage users have hit weekly caps even under the $200/month Max plan, and Anthropic is enforcing new limits beginning August 28, 2025
 ---
 
 ## Video Tutorial
