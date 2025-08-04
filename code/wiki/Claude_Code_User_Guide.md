@@ -114,7 +114,7 @@ echo 'export ANTHROPIC_API_KEY="your-api-key"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Getting Started
+## [Getting Started](https://docs.anthropic.com/en/docs/claude-code/quickstart)
 
 ### Basic Environment Setup
 
