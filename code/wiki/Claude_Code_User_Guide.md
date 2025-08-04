@@ -58,8 +58,13 @@ wsl --install
 
 # 2. After restarting, open WSL terminal
 # 3. Install Node.js in WSL
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
+1) install nvm(Node Version Manager): 
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+2) reboot terminal or run the following: 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+3)install Node.js 18: nvm install 18
 
 # 4. Verify installation
 node --version  # Should show v18.x.x or higher
@@ -67,11 +72,13 @@ node --version  # Should show v18.x.x or higher
 
 #### Mac Users
 ```bash
-# Using Homebrew
-brew install node@18
-
-# Or download installer from official website
-# Visit https://nodejs.org/ to download LTS version
+# Open terminal
+1) install nvm(Node Version Manager): 
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+2) reboot terminal or run the following: 
+export NVM_DIR="$HOME/.nvm"      
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+3)install Node.js 18: nvm install 18
 
 # Verify installation
 node --version
@@ -80,12 +87,12 @@ node --version
 #### Linux Users
 ```bash
 # Ubuntu/Debian
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# CentOS/RHEL/Fedora
-curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-sudo yum install nodejs
+1) install nvm(Node Version Manager): 
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+2) reboot terminal or run the following: 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+3)install Node.js 18: nvm install 18
 
 # Verify installation
 node --version
