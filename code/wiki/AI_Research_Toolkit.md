@@ -14,7 +14,7 @@ flowchart LR
     D --> E["4. Hand off<br/>handoff.md"]
     E --> F["5. Reuse<br/>Skills · find-skills"]
     F --> G["6. Write<br/>statgen style · defensive · Humanizer"]
-    G --> H["7. Present<br/>PPT Master"]
+    G --> H["7. Present<br/>scientific-slides"]
 ```
 
 ---
@@ -31,7 +31,7 @@ flowchart LR
 | 5a | [Reuse](#5a-make-it-a-skill) | Make it a skill | Turn a good session into a `/command` |
 | 5b | [Reuse](#5b-find-skills--top-skills) | find-skills, top skills | Use skills other people already wrote |
 | 6 | [Writing](#6-writing) | statgen-writing-style · defensive writing · Humanizer · ref verification | Write in lab style, stop GPT from watering down claims, sound human, cite real papers |
-| 7 | [Present](#7-ppt-master-documents-to-editable-pptx) | PPT Master | Paper → **editable** PowerPoint |
+| 7 | [Present](#7-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) | scientific-slides | Papers → lab-style talk as Beamer/PDF or **editable** PPTX |
 | 8 | [StatGen tips](#8-practical-tips-for-statgen-research) | HPC, big files, simulation checks, DUAs | Lessons from using AI on real genetics projects |
 
 ---
@@ -450,6 +450,7 @@ Inside Claude Code you can then just ask: *"Is there a skill for making publicat
 | **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | Large (100+ skills): install only what you need, e.g. `npx skills add K-Dense-AI/claude-scientific-skills --skill scanpy` |
 | **nature-skills** | Academic workflow: literature search, paper reading, reference verification, polishing, reviewer responses, figures | `git clone https://github.com/Yuan1z0825/nature-skills` |
 | **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 6a](#6a-statgen-writing-style-write-like-the-lab) |
+| **scientific-slides** (lab) | Lab-style talks as Beamer/PDF or editable PPTX | Claude Teams org skill; see [Part 7](#7-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) |
 
 ### Tips
 
@@ -637,42 +638,67 @@ confirm the cited paper actually supports the sentence; list any mismatches.
 
 ---
 
-## 7. PPT Master: Documents to Editable PPTX
+## 7. scientific-slides: Talks in the Lab Style (Beamer/PDF or PPTX)
 
 ### What it is
 
-[PPT Master](https://github.com/hugohe3/ppt-master) runs as a workflow inside AI coding tools (Claude Code, Codex, ...). Give it a PDF, Word file, Markdown, or URL and it produces a **real, editable `.pptx`** built from native PowerPoint shapes, not screenshots. You can move boxes, change text, and restyle it.
+`scientific-slides` turns papers, manuscripts, notes, and old decks into a **scientific talk**: lab meetings, journal clubs, seminars, lectures, or several of your papers joined into one story. It started from Gao's lecture-preparation SOPs, and we extended it to output PowerPoint as well. It applies the same rules as Gao's writing style ([6a](#6a-statgen-writing-style-write-like-the-lab)), adapted for slides:
+
+- **Story first.** Open with a concrete question or tension, give each slide one job, and connect papers through a shared model. Never "Paper 1 / Paper 2 / Paper 3".
+- **Models explained properly.** Show the smallest complete model, say what is observed, assumed, or estimated, and give the formula before the numbers. A new method is introduced as a change to the old model.
+- **Honest figures.** Use real figures from the paper for evidence and drawn diagrams for mechanisms. Never fabricate data points, citations, or benchmarks. Credits are short (`Author et al. (year), Fig. N`), and full provenance goes in `planning/figures.csv`.
+- **Lab visual style.** White slides, blue structure, sparse **dark-red bold** for decisive terms, *blue italic* for concepts, a named blue box for a math fact (e.g. "Variance of a Sum") right before it is first used, and spoken background in presenter notes.
+- **No shrinking text to fit.** If a slide is too full, it cuts, moves detail to notes, or splits the slide.
+
+**Two output formats, one style:**
+
+| You ask for | You get |
+|---|---|
+| Nothing specific (default) | Editable **LaTeX Beamer + PDF** |
+| "PPTX" / "PowerPoint", or you give it a `.pptx` to revise | Editable **native-shape `.pptx`**: real text boxes and shapes, LaTeX-rendered formulas, speaker notes. The same palette and rules as the Beamer version |
 
 ### Install
 
-```bash
-git clone https://github.com/hugohe3/ppt-master.git
-cd ppt-master
-pip install -r requirements.txt   # Python 3.10–3.14
-claude          # run your AI tool inside the repo so it picks up the workflow
-```
+**It is already in our Claude Teams org skills as `scientific-slides`.** Nothing to install: it shows up for everyone in the org. In Claude Code it syncs automatically and appears as `anthropic-skills:scientific-slides` (start a new session if you don't see it yet). Type `/scientific-slides`, or just say "use scientific-slides to…".
 
-Or install it as a skill: `npx skills add hugohe3/ppt-master`.
+For PPTX it uses `python-pptx`, plus LaTeX for formulas and LibreOffice to render pages for checking. On the HPC: `pip install python-pptx pyyaml` (LaTeX and LibreOffice are already there).
 
 ### How to use
 
 ```
-Make a 12-slide journal-club deck from ~/papers_md/colocboost_2025.md:
-motivation, model, simulation results, real-data application, limitations, discussion questions.
-Clean academic style, one key message per slide, include the main figures.
+Use scientific-slides. Make a 20-minute journal-club deck as PPTX from papers/colocboost.pdf.
+Audience: statistical geneticists who know coloc but not ColocBoost.
+Open with the question the paper answers, show the model before the results, use the paper's
+real figures for evidence, put the key identity in a blue box before first use,
+and write what I'll say in the speaker notes. Render every page and check it.
 ```
 
-Before generating, it proposes a **design spec** (outline, style, colors) and waits for you to confirm. Reply "confirm" or ask for changes; say "quick generation" to skip the step.
+```
+Use scientific-slides. Only revise slides 5–6 of talk.pptx: make the model slide follow from
+slide 4. Keep the theme, the other slides, and the notes unchanged; save as talk_v2.pptx and
+show me the rendered pages you changed.
+```
 
-Output goes to `exports/<name>_<timestamp>.pptx` (native shapes, edit this one); the per-slide SVGs are kept in `svg_final/`.
+```
+Use scientific-slides. Audit the narrative of my lab-meeting deck (talk.pptx): where does
+the story jump, which quantities are undefined? Don't edit any files.
+```
 
-It can also **learn a template** from a deck you like (e.g., a previous lab meeting deck) and reuse it, or **fill an existing `.pptx`** with new content while keeping its design.
+What happens behind the scenes, for PPTX:
+
+1. It writes `talk/deck.yaml`: one entry per slide (title, columns, bullets, cards, equations, notes, credit).
+2. `pptxkit.py build` turns that into `deck.pptx` and reports overfull slides and lint errors.
+3. `pptxkit.py render` turns each page into an image, and Claude **looks at every page** and fixes problems.
+4. You get `deck.pptx` (edit it in PowerPoint), `deck.yaml` (the editable source), the rendered pages in `qa/`, and `planning/claims.csv` (which source supports each claim).
 
 ### Tips
 
-- Feed it **MarkItDown output** ([Part 1](#1-markitdown-any-file-to-markdown)) for cleaner structure.
-- Check every number and figure on the slides against the paper. Layout tools still make mistakes.
-- Use the official `hugohe3` repo. Several copies with the same name exist on GitHub.
+- Give it the **real sources** (PDFs or MarkItDown output from [Part 1](#1-markitdown-any-file-to-markdown)). It will not invent figures or numbers it can't find. It marks them "check before talk" instead.
+- Say **audience and minutes**. That decides what gets cut, not a slides-per-minute rule.
+- To **audit any deck**, including hand-made ones, run `python3 pptxkit.py audit talk.pptx`. It flags shrink-to-fit, text under 17 pt, shapes off the slide, and overcrowded slides.
+- Always open the final file yourself. Renders come from LibreOffice, and PowerPoint can wrap lines slightly differently.
+
+**Alternative:** [PPT Master](https://github.com/hugohe3/ppt-master) (`npx skills add hugohe3/ppt-master`) quickly turns any document into an editable `.pptx` with a generic design and can copy the look of a template deck. Use it for non-research slides. For lab talks, use `scientific-slides`.
 
 ---
 
@@ -740,6 +766,7 @@ Ask for scripts, not interactive one-offs. Every AI-run analysis should leave a 
 | Statistical reporting check | `nature-statistics` |
 | Figures | `nature-figure`, or the `dataviz` skill |
 | Response to reviewers | `nature-response` + [calibrated-claim prompts](#6b-defensive-writing-dont-let-gpt-water-down-your-claims) + [Codex scoring](#3-codex-review-independent-scoring) |
+| Lab meeting / journal club slides | `scientific-slides` ([Part 7](#7-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx)) |
 | Long multi-day analysis | [OpenSpec](#2-openspec-spec-driven-development) for the plan + [`handoff.md`](#4-handoffmd-never-lose-context) between sessions |
 
 ### 8.7 Derivations: ask for LaTeX *and* a numeric check
@@ -763,7 +790,7 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 | Polish without GPT watering down claims | Calibrated-claim prompts | "Language edit only. Keep every claim at its current strength; flag, don't change" |
 | Remove AI tone | Humanizer | `/humanizer` |
 | Check citations are real | nature-ref-verifier | "Verify every reference in…" |
-| Paper → slides | PPT Master | "Make a 12-slide deck from…" |
+| Paper → slides | scientific-slides | `/scientific-slides` "20-min journal club as PPTX from paper.pdf" |
 
 ## Your First Week
 
@@ -786,7 +813,7 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 - skills.sh directory: <https://skills.sh> · find-skills: <https://github.com/vercel-labs/skills>
 - obra/superpowers: <https://github.com/obra/superpowers>
 - Humanizer: <https://github.com/blader/humanizer> · Wikipedia "Signs of AI writing": <https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing>
-- PPT Master: <https://github.com/hugohe3/ppt-master>
+- scientific-slides: Claude Teams org skill (based on Gao Wang's lecture SOPs; PPTX output added 2026-11) · PPT Master (alternative): <https://github.com/hugohe3/ppt-master>
 - nature-skills: <https://github.com/Yuan1z0825/nature-skills>
 - Defensive writing in GPT models (Liao et al.): <https://arxiv.org/abs/2610.11355>
 - Felix Rieseberg, "How to be more ambitious: A tutorial for humans with models" (2026): <https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/>
