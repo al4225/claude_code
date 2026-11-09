@@ -2,7 +2,7 @@
 
 A tiny, real Python package for GWAS summary statistics, developed with [OpenSpec](https://github.com/Fission-AI/OpenSpec) (v1.16.1). It shows both states of the OpenSpec workflow so you can **read a finished change** and **run one yourself**.
 
-Back to the guide: [AI_Research_Toolkit.md §2](../../code/wiki/AI_Research_Toolkit.md#2-openspec-spec-driven-development)
+Back to the guide: [AI_Research_Toolkit.md §1](../../code/wiki/AI_Research_Toolkit.md#1-openspec-spec-driven-development)
 
 ## What's in here
 

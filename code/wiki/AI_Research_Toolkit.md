@@ -8,14 +8,13 @@ The sections follow the order of a real project. Read top to bottom the first ti
 
 ```mermaid
 flowchart LR
-    A["0. Prompt well<br/>Altitude · Depth · Range"] --> B["1. Feed context<br/>MarkItDown"]
-    B --> C["2. Plan<br/>OpenSpec"]
-    C --> D["3. Verify<br/>Codex independent score"]
-    D --> E["4. Hand off<br/>handoff.md"]
-    E --> G["5. Write<br/>statgen style · defensive · Humanizer"]
-    G --> H["6. Present<br/>scientific-slides"]
-    H --> I["7. StatGen tips"]
-    I --> F["8. Reuse<br/>Skills · find-skills"]
+    A["0. Prompt well<br/>Altitude · Depth · Range"] --> C["1. Plan<br/>OpenSpec"]
+    C --> D["2. Verify<br/>Codex independent score"]
+    D --> E["3. Hand off<br/>handoff.md"]
+    E --> G["4. Write<br/>statgen style · defensive · Humanizer"]
+    G --> H["5. Present<br/>scientific-slides"]
+    H --> I["6. StatGen tips"]
+    I --> F["7. Reuse<br/>Skills · find-skills"]
 ```
 
 ---
@@ -25,15 +24,14 @@ flowchart LR
 | # | Part | Tool / Tip | One-line pitch |
 |---|------|-----------|----------------|
 | 0 | [How to talk to AI](#0-how-to-talk-to-ai-altitude-depth-range) | Altitude / Depth / Range | Stop saying "you are an expert in X". Give it a goal, a workflow, and an outcome |
-| 1 | [Feed context](#1-markitdown-any-file-to-markdown) | MarkItDown | PDF / Word / PPT / Excel → Markdown. Fewer tokens, better answers |
-| 2 | [Plan](#2-openspec-spec-driven-development) | OpenSpec | Agree on a written spec before AI writes code |
-| 3 | [Verify](#3-codex-review-independent-scoring) | Codex independent scoring | A second model scores the work against a rubric |
-| 4 | [Continuity](#4-handoffmd-never-lose-context) | `handoff.md` | One file that lets a new session pick up where the last one stopped |
-| 5 | [Writing](#5-writing) | statgen-writing-style · defensive writing · Humanizer · ref verification | Write in lab style, stop GPT from watering down claims, sound human, cite real papers |
-| 6 | [Present](#6-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) | scientific-slides | Papers → lab-style talk as Beamer/PDF or **editable** PPTX |
-| 7 | [StatGen tips](#7-practical-tips-for-statgen-research) | HPC, big files, simulation checks, DUAs | Lessons from using AI on real genetics projects |
-| 8a | [Reuse](#8a-make-it-a-skill) | Make it a skill | Turn a good session into a `/command` |
-| 8b | [Reuse](#8b-find-skills--top-skills) | find-skills, top skills | Use skills other people already wrote |
+| 1 | [Plan](#1-openspec-spec-driven-development) | OpenSpec | Agree on a written spec before AI writes code |
+| 2 | [Verify](#2-codex-review-independent-scoring) | Codex independent scoring | A second model scores the work against a rubric |
+| 3 | [Continuity](#3-handoffmd-never-lose-context) | `handoff.md` | One file that lets a new session pick up where the last one stopped |
+| 4 | [Writing](#4-writing) | statgen-writing-style · defensive writing · Humanizer · ref verification | Write in lab style, stop GPT from watering down claims, sound human, cite real papers |
+| 5 | [Present](#5-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) | scientific-slides | Papers → lab-style talk as Beamer/PDF or **editable** PPTX |
+| 6 | [StatGen tips](#6-practical-tips-for-statgen-research) | HPC, big files, simulation checks, DUAs, MarkItDown | Lessons from using AI on real genetics projects |
+| 7a | [Reuse](#7a-make-it-a-skill) | Make it a skill | Turn a good session into a `/command` |
+| 7b | [Reuse](#7b-find-skills--top-skills) | find-skills, top skills | Use skills other people already wrote |
 
 ---
 
@@ -167,7 +165,7 @@ StatGen example:
 
 ### Always: verify outside the model
 
-*"Do not ask the model to judge itself."* The best check is *"a tool the model can run to get feedback immediately"*: tests, a simulation with known truth, a held-out dataset, or a different model reviewing the work (see [Part 3](#3-codex-review-independent-scoring) and [7.3](#73-validate-statistical-code-with-simulation)). Write the check into the prompt itself, as in item (4) of the depth prompt.
+*"Do not ask the model to judge itself."* The best check is *"a tool the model can run to get feedback immediately"*: tests, a simulation with known truth, a held-out dataset, or a different model reviewing the work (see [Part 2](#2-codex-review-independent-scoring) and [6.3](#63-validate-statistical-code-with-simulation)). Write the check into the prompt itself, as in item (4) of the depth prompt.
 
 ### One template that combines all three
 
@@ -193,64 +191,7 @@ Then do it, and verify it with (4).
 
 ---
 
-## 1. MarkItDown: Any File to Markdown
-
-### What it is
-
-[MarkItDown](https://github.com/microsoft/markitdown) (Microsoft) converts PDF, Word, PowerPoint, Excel, HTML, images (OCR), audio, and more into **clean Markdown**.
-
-### Why it matters
-
-- **Saves tokens.** Markdown is the format LLMs handle best. A PDF read through the vision path, or a `.docx` full of XML, costs many more tokens than the same text as Markdown.
-- **Better answers.** Headings, tables, and lists survive conversion, so the model sees the paper's structure.
-- **Convert once, reuse many times.** The `.md` file can go into a project folder, a notes folder, or any AI tool.
-
-### Install
-
-```bash
-pip install 'markitdown[all]'          # everything
-pip install 'markitdown[pdf,docx,pptx]' # or only what you need
-```
-
-### How to use
-
-```bash
-# One file
-markitdown paper.pdf -o paper.md
-
-# A folder of papers
-mkdir -p papers_md
-for f in papers/*.pdf; do markitdown "$f" -o "papers_md/$(basename "${f%.pdf}").md"; done
-
-# Reviewer comments in Word, a collaborator's slides
-markitdown reviews_round1.docx -o reviews_round1.md
-markitdown lab_meeting.pptx    -o lab_meeting.md
-```
-
-Then in Claude Code:
-
-```
-Read papers_md/susie_2020.md and papers_md/colocboost_2025.md.
-Make a table comparing their model assumptions, priors, and how each handles multiple causal variants.
-```
-
-**Optional: as an MCP server**, so Claude converts files on its own:
-
-```bash
-pip install markitdown-mcp
-claude mcp add markitdown -- markitdown-mcp
-```
-
-### Tips
-
-- Equations in PDFs often come out garbled. For math-heavy papers, check the Methods section or use the arXiv LaTeX source.
-- Scanned PDFs need OCR. Check the output before relying on it.
-- **PDF tables lose their structure**: they come out as plain lines of text, not Markdown tables. Word/Excel/PPT tables convert cleanly. For a key PDF table, ask for the supplementary `.xlsx`/`.csv` instead.
-- Keep the converted `.md` next to the original so you don't convert the same file twice.
-
----
-
-## 2. OpenSpec: Spec-Driven Development
+## 1. OpenSpec: Spec-Driven Development
 
 ### What it is
 
@@ -311,12 +252,12 @@ You fix anything wrong in the plan (e.g., "PSD check should allow a small tolera
 ### Tips
 
 - **The review step is the point.** Ten minutes editing `design.md` saves hours of undoing AI code.
-- Pair with [Part 3](#3-codex-review-independent-scoring): have Codex score the proposal before `/opsx:apply`.
+- Pair with [Part 2](#2-codex-review-independent-scoring): have Codex score the proposal before `/opsx:apply`.
 - Command names differ between versions. Run `openspec --help` or see <https://openspec.dev/docs/getting-started>.
 
 ---
 
-## 3. Codex Review: Independent Scoring
+## 2. Codex Review: Independent Scoring
 
 ### The idea
 
@@ -397,11 +338,11 @@ Claude writes → Codex scores (rubric) → Claude fixes BLOCKING → Codex re-s
 - **Don't enable auto-review on every edit.** It burns quota in an endless loop. Score at milestones (after the plan, after implementation, before PR).
 - Scores are a signal, not ground truth. Read the blocking items yourself.
 - **On our HPC, Codex's sandbox fails** (`bwrap: pivot_root: Invalid argument`): it can't run `git diff` or tests, and on some nodes can't even read files, so it returns `OVERALL: N/A`. Fix: put the files in the prompt yourself (see the HPC variant under Option B) and run the tests yourself.
-- **For prose, don't loop "rewrite until the AI reviewer score goes up".** AI reviewers reward hedging, and repeated review → revise rounds make GPT retract more and more of your claims (see [6b](#5b-defensive-writing-dont-let-gpt-water-down-your-claims)). Use the score to *find* issues; fix them yourself.
+- **For prose, don't loop "rewrite until the AI reviewer score goes up".** AI reviewers reward hedging, and repeated review → revise rounds make GPT retract more and more of your claims (see [6b](#4b-defensive-writing-dont-let-gpt-water-down-your-claims)). Use the score to *find* issues; fix them yourself.
 
 ---
 
-## 4. `handoff.md`: Never Lose Context
+## 3. `handoff.md`: Never Lose Context
 
 ### The problem
 
@@ -460,11 +401,11 @@ Even simpler: this repo ships a ready-made skill at [`skills/handoff/SKILL.md`](
 
 ---
 
-## 5. Writing
+## 4. Writing
 
 Writing is where AI helps most and also where it hurts most if used naively. Use these in order: **draft in lab style → keep claims calibrated (no AI over-hedging) → make it sound human → verify every reference**.
 
-### 5a. statgen-writing-style: Write Like the Lab
+### 4a. statgen-writing-style: Write Like the Lab
 
 Gao shared a skill that encodes the **Wang group writing style**, derived from the SuSiE, mvSuSiE, ColocBoost, SuSiE-Ann, jeTWAS, and fSuSiE papers. It applies to manuscripts, figure legends, supplementary notes, Specific Aims, and response letters.
 
@@ -490,7 +431,7 @@ that isn't supported by a figure or table we have.
 Review my Introduction against statgen-writing-style. List violations with line references; don't rewrite yet.
 ```
 
-### 5b. Defensive Writing: Don't Let GPT Water Down Your Claims
+### 4b. Defensive Writing: Don't Let GPT Water Down Your Claims
 
 **Problem → why it happens → how to prevent it → how to check.**
 
@@ -570,7 +511,7 @@ Then fix the real problems yourself, with a new analysis or one targeted sentenc
 
 Already have a revised draft? Ask: *"Compare original.md and revised.md. Label each claim kept / softened / retracted. For every new qualification, cite the data that requires it, or mark it UNGROUNDED."* Then revert the ungrounded ones.
 
-### 5c. Humanizer: Remove AI-Writing Tells
+### 4c. Humanizer: Remove AI-Writing Tells
 
 > Not the same as the *Humanize* plugin in the old page (that one is for plans and PR loops).
 
@@ -587,7 +528,7 @@ npx skills add blader/humanizer
 
 Tips: run it **after** content is final, not before. Check that technical terms weren't changed for "variety" (e.g., *credible set* must stay *credible set*). It complements statgen-writing-style, it doesn't replace it.
 
-### 5d. Verify Every Reference
+### 4d. Verify Every Reference
 
 LLMs make up citations: real-looking authors, plausible titles, wrong years, fake DOIs. **Never paste an AI-generated reference list without checking it.**
 
@@ -601,11 +542,11 @@ confirm the cited paper actually supports the sentence; list any mismatches.
 
 ---
 
-## 6. scientific-slides: Talks in the Lab Style (Beamer/PDF or PPTX)
+## 5. scientific-slides: Talks in the Lab Style (Beamer/PDF or PPTX)
 
 ### What it is
 
-`scientific-slides` turns papers, manuscripts, notes, and old decks into a **scientific talk**: lab meetings, journal clubs, seminars, lectures, or several of your papers joined into one story. It started from Gao's lecture-preparation SOPs, and we extended it to output PowerPoint as well. It applies the same rules as Gao's writing style ([6a](#5a-statgen-writing-style-write-like-the-lab)), adapted for slides:
+`scientific-slides` turns papers, manuscripts, notes, and old decks into a **scientific talk**: lab meetings, journal clubs, seminars, lectures, or several of your papers joined into one story. It started from Gao's lecture-preparation SOPs, and we extended it to output PowerPoint as well. It applies the same rules as Gao's writing style ([6a](#4a-statgen-writing-style-write-like-the-lab)), adapted for slides:
 
 - **Story first.** Open with a concrete question or tension, give each slide one job, and connect papers through a shared model. Never "Paper 1 / Paper 2 / Paper 3".
 - **Models explained properly.** Show the smallest complete model, say what is observed, assumed, or estimated, and give the formula before the numbers. A new method is introduced as a change to the old model.
@@ -656,7 +597,7 @@ What happens behind the scenes, for PPTX:
 
 ### Tips
 
-- Give it the **real sources** (PDFs or MarkItDown output from [Part 1](#1-markitdown-any-file-to-markdown)). It will not invent figures or numbers it can't find. It marks them "check before talk" instead.
+- Give it the **real sources** (PDFs or MarkItDown output from [6.8](#68-give-ai-documents-as-markdown-markitdown)). It will not invent figures or numbers it can't find. It marks them "check before talk" instead.
 - Say **audience and minutes**. That decides what gets cut, not a slides-per-minute rule.
 - To **audit any deck**, including hand-made ones, run `python3 pptxkit.py audit talk.pptx`. It flags shrink-to-fit, text under 17 pt, shapes off the slide, and overcrowded slides.
 - Always open the final file yourself. Renders come from LibreOffice, and PowerPoint can wrap lines slightly differently.
@@ -665,11 +606,11 @@ What happens behind the scenes, for PPTX:
 
 ---
 
-## 7. Practical Tips for StatGen Research
+## 6. Practical Tips for StatGen Research
 
 What we have learned using AI on real genetics projects on the HPC.
 
-### 7.1 Put HPC rules in `CLAUDE.md`
+### 6.1 Put HPC rules in `CLAUDE.md`
 
 The AI doesn't know your cluster. Tell it once in a project `CLAUDE.md`:
 
@@ -686,7 +627,7 @@ The AI doesn't know your cluster. Tell it once in a project `CLAUDE.md`:
 - Large outputs: write to files; print only summaries.
 ```
 
-### 7.2 Big files: inspect, don't read
+### 6.2 Big files: inspect, don't read
 
 A 5 GB VCF or a 10M-row sumstats file will flood the context (or crash the session). Ask for **summaries computed by code**:
 
@@ -695,7 +636,7 @@ Don't open the file. Write and run a script that reports: number of variants, co
 guess, % missing per column, and the first 5 rows.
 ```
 
-### 7.3 Validate statistical code with simulation
+### 6.3 Validate statistical code with simulation
 
 AI-written statistical code can *run* and still be *wrong* (sign errors, wrong variance, off-by-one in LD indexing). Always ask for a simulation check:
 
@@ -707,7 +648,7 @@ the credible sets, (2) coverage across 100 replicates is ≈ 95%, (3) under the 
 
 Simulation under known truth is the most reliable external check you have, in the same spirit as "verify externally" in [Part 0](#0-how-to-talk-to-ai-altitude-depth-range).
 
-### 7.4 Protect controlled-access data
+### 6.4 Protect controlled-access data
 
 - **Individual-level data under a DUA (dbGaP, UK Biobank, AMP-AD, ...) must not be sent to cloud AI services.** That includes pasting rows, letting the agent `cat` the files, or uploading them.
 - Safer: let the AI write code that runs **locally** and only prints aggregate summaries; share only public summary statistics or simulated data.
@@ -717,28 +658,42 @@ Simulation under known truth is the most reliable external check you have, in th
   ```
   Absolute paths need **two** leading slashes (`//path/...`); a single `/` is read as relative to the project. The rule also stops Claude from reading those files via `cat`/`head` in Bash.
 
-### 7.5 Reproducibility by default
+### 6.5 Reproducibility by default
 
 Ask for scripts, not interactive one-offs. Every AI-run analysis should leave a script, fixed seeds, recorded package versions (`sessionInfo()` / `pip freeze`), and a short note in the project log. Commit before and after each AI change so you can roll back (see [practices_RL.md](practices_RL.md) for the git rollback strategy).
 
-### 7.6 Use the skills you already have
+### 6.6 Use the skills you already have
 
 | Task | Tool |
 |------|------|
 | Literature search / reading / paper cards | nature-skills (`nature-academic-search`, `nature-reader`, `nature-paper-card`) |
 | Statistical reporting check | `nature-statistics` |
 | Figures | `nature-figure`, or the `dataviz` skill |
-| Response to reviewers | `nature-response` + [calibrated-claim prompts](#5b-defensive-writing-dont-let-gpt-water-down-your-claims) + [Codex scoring](#3-codex-review-independent-scoring) |
-| Lab meeting / journal club slides | `scientific-slides` ([Part 6](#6-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx)) |
-| Long multi-day analysis | [OpenSpec](#2-openspec-spec-driven-development) for the plan + [`handoff.md`](#4-handoffmd-never-lose-context) between sessions |
+| Response to reviewers | `nature-response` + [calibrated-claim prompts](#4b-defensive-writing-dont-let-gpt-water-down-your-claims) + [Codex scoring](#2-codex-review-independent-scoring) |
+| Lab meeting / journal club slides | `scientific-slides` ([Part 5](#5-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx)) |
+| Long multi-day analysis | [OpenSpec](#1-openspec-spec-driven-development) for the plan + [`handoff.md`](#3-handoffmd-never-lose-context) between sessions |
 
-### 7.7 Derivations: ask for LaTeX *and* a numeric check
+### 6.7 Derivations: ask for LaTeX *and* a numeric check
 
 When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the derivation step by step in LaTeX and (2) check it numerically: finite-difference gradients, or compare the closed form against Monte Carlo. A derivation that reads well is not necessarily correct.
 
+
+### 6.8 Give AI documents as Markdown (MarkItDown)
+
+[MarkItDown](https://github.com/microsoft/markitdown) converts PDF / Word / PPT / Excel to Markdown. That costs fewer tokens than having the model read the raw file, and headings and lists survive.
+
+```bash
+pip install 'markitdown[all]'
+markitdown paper.pdf -o paper.md
+# optional: let Claude convert files itself
+pip install markitdown-mcp && claude mcp add markitdown -- markitdown-mcp
+```
+
+PDF equations and tables come out as plain text, so check them against the original (or use the arXiv LaTeX source / supplementary `.xlsx`).
+
 ---
 
-## 8a. Make It a Skill
+## 7a. Make It a Skill
 
 ### The idea
 
@@ -797,7 +752,7 @@ Or use Anthropic's **skill-creator** skill, which interviews you, drafts the ski
 
 ---
 
-## 8b. find-skills & Top Skills
+## 7b. find-skills & Top Skills
 
 ### find-skills: search before you write
 
@@ -824,12 +779,12 @@ Inside Claude Code you can then just ask: *"Is there a skill for making publicat
 | **anthropics/skills** | Official: `pdf`, `docx`, `pptx`, `xlsx`, `skill-creator`, `frontend-design` | `/plugin marketplace add anthropics/skills` then `/plugin install document-skills@anthropic-agent-skills` (and/or `example-skills@anthropic-agent-skills`) |
 | **obra/superpowers** | Disciplined dev workflow: brainstorming → writing plans → TDD → systematic debugging | `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace` |
 | **find-skills** (vercel-labs) | Search and install skills from skills.sh | see above |
-| **humanizer** (blader) | Remove AI-writing tells from prose | see [Part 5c](#5c-humanizer-remove-ai-writing-tells) |
+| **humanizer** (blader) | Remove AI-writing tells from prose | see [Part 4c](#4c-humanizer-remove-ai-writing-tells) |
 | **obsidian-skills** (kepano) | If you keep notes in [Obsidian](https://obsidian.md): teaches the agent Obsidian Markdown (wikilinks, callouts), Bases, and Canvas | `npx skills add kepano/obsidian-skills` |
 | **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | Large (100+ skills): install only what you need, e.g. `npx skills add K-Dense-AI/claude-scientific-skills --skill scanpy` |
 | **nature-skills** | Academic workflow: literature search, paper reading, reference verification, polishing, reviewer responses, figures | `git clone https://github.com/Yuan1z0825/nature-skills` |
-| **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 5a](#5a-statgen-writing-style-write-like-the-lab) |
-| **scientific-slides** (lab) | Lab-style talks as Beamer/PDF or editable PPTX | Claude Teams org skill; see [Part 6](#6-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) |
+| **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 4a](#4a-statgen-writing-style-write-like-the-lab) |
+| **scientific-slides** (lab) | Lab-style talks as Beamer/PDF or editable PPTX | Claude Teams org skill; see [Part 5](#5-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) |
 
 ### Tips
 
