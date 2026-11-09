@@ -8,7 +8,7 @@ The sections follow the order of a real project. Read top to bottom the first ti
 
 ```mermaid
 flowchart LR
-    A["0. Prompt well<br/>Altitude · Depth · Range"] --> B["1. Feed context<br/>MarkItDown · Obsidian"]
+    A["0. Prompt well<br/>Altitude · Depth · Range"] --> B["1. Feed context<br/>MarkItDown"]
     B --> C["2. Plan<br/>OpenSpec"]
     C --> D["3. Verify<br/>Codex independent score"]
     D --> E["4. Hand off<br/>handoff.md"]
@@ -24,8 +24,7 @@ flowchart LR
 | # | Part | Tool / Tip | One-line pitch |
 |---|------|-----------|----------------|
 | 0 | [How to talk to AI](#0-how-to-talk-to-ai-altitude-depth-range) | Altitude / Depth / Range | Stop saying "you are an expert in X". Give it a goal, a workflow, and an outcome |
-| 1a | [Feed context](#1a-markitdown-any-file-to-markdown) | MarkItDown | PDF / Word / PPT / Excel → Markdown. Fewer tokens, better answers |
-| 1b | [Feed context](#1b-obsidian-a-knowledge-base-your-ai-can-read) | Obsidian | Your notes as plain Markdown that Claude can read, search, and maintain |
+| 1 | [Feed context](#1-markitdown-any-file-to-markdown) | MarkItDown | PDF / Word / PPT / Excel → Markdown. Fewer tokens, better answers |
 | 2 | [Plan](#2-openspec-spec-driven-development) | OpenSpec | Agree on a written spec before AI writes code |
 | 3 | [Verify](#3-codex-review-independent-scoring) | Codex independent scoring | A second model scores the work against a rubric |
 | 4 | [Continuity](#4-handoffmd-never-lose-context) | `handoff.md` | One file that lets a new session pick up where the last one stopped |
@@ -93,7 +92,7 @@ The rule that goes with all three: **verify externally**. In his words, *"Do not
 
 ---
 
-## 1a. MarkItDown: Any File to Markdown
+## 1. MarkItDown: Any File to Markdown
 
 ### What it is
 
@@ -103,7 +102,7 @@ The rule that goes with all three: **verify externally**. In his words, *"Do not
 
 - **Saves tokens.** Markdown is the format LLMs handle best. A PDF read through the vision path, or a `.docx` full of XML, costs many more tokens than the same text as Markdown.
 - **Better answers.** Headings, tables, and lists survive conversion, so the model sees the paper's structure.
-- **Convert once, reuse many times.** The `.md` file can go into Obsidian, a project folder, or any AI tool.
+- **Convert once, reuse many times.** The `.md` file can go into a project folder, a notes folder, or any AI tool.
 
 ### Install
 
@@ -147,74 +146,6 @@ claude mcp add markitdown -- markitdown-mcp
 - Scanned PDFs need OCR. Check the output before relying on it.
 - **PDF tables lose their structure**: they come out as plain lines of text, not Markdown tables. Word/Excel/PPT tables convert cleanly. For a key PDF table, ask for the supplementary `.xlsx`/`.csv` instead.
 - Keep the converted `.md` next to the original so you don't convert the same file twice.
-
----
-
-## 1b. Obsidian: a Knowledge Base Your AI Can Read
-
-### What it is
-
-[Obsidian](https://obsidian.md) is a note-taking app. Its "vault" is just **a folder of Markdown files on your disk**, which is exactly what Claude Code is good at reading, searching, and editing. Run `claude` inside the vault and your notes become a knowledge base for the AI.
-
-> **Hands-on example:** [`examples/obsidian_vault/`](../../examples/obsidian_vault/README.md) is a working demo vault: a `CLAUDE.md` with templates, 4 paper notes (SuSiE, SuSiE-RSS, coloc, coloc+SuSiE), concept notes, a Word file converted with MarkItDown and turned into a linked meeting note, a project with `log.md` / `decisions.md` / `handoff.md`, and **saved example answers** in `outputs/`. Open it in Obsidian, or `cd` into it and run `claude`.
-
-### Why it matters for research
-
-- Paper notes, meeting notes, analysis logs, and ideas all live in one searchable place, linked with `[[wikilinks]]`.
-- Claude can **answer questions across your notes** ("What did we decide about the LD reference panel in September?").
-- Claude can **maintain the notes for you**: summarize new papers into notes, update a project log, and link related ideas.
-
-### Setup
-
-1. Install Obsidian and create a vault, e.g. `~/vault/`.
-2. Suggested layout:
-   ```
-   vault/
-   ├── CLAUDE.md          # rules for the AI: folder layout, note template, naming
-   ├── raw/               # MarkItDown output of papers, untouched
-   ├── papers/            # one note per paper (AI-written, you review)
-   ├── projects/          # one folder per project: log.md, decisions.md, handoff.md
-   └── meetings/          # lab meeting / 1:1 notes
-   ```
-3. Optional: teach Claude Obsidian syntax (wikilinks, callouts, Bases, Canvas) with Obsidian CEO kepano's skills:
-   ```bash
-   npx skills add kepano/obsidian-skills
-   ```
-4. Optional: the **Obsidian Web Clipper** browser extension saves web pages and papers into `raw/` as Markdown.
-
-### Example `CLAUDE.md` for a vault
-
-```markdown
-# Vault rules
-- Paper notes go in papers/<firstauthor><year>_<keyword>.md using the template below.
-- Never edit files in raw/.
-- Every paper note links to related methods with [[wikilinks]] (e.g. [[SuSiE]], [[colocalization]]).
-- When asked "what do we know about X", search papers/ and projects/ first and cite note names.
-
-## Paper note template
-- **Question**: ...
-- **Method**: model, assumptions, inference
-- **Data**: ...
-- **Key result** (with numbers): ...
-- **Relevance to our work**: ...
-- **Limitations / open questions**: ...
-```
-
-### Example prompts
-
-```
-Turn every new file in raw/ into a paper note using the template, and link it to existing notes.
-```
-
-```
-Across papers/ and projects/, what approaches have we considered for multi-ancestry fine-mapping?
-Give a table with pros and cons and cite the note names.
-```
-
-### Tips
-
-- This idea is sometimes called an **"LLM wiki"**: raw sources go in, the AI maintains a structured, linked wiki on top, and you curate.
-- Sync the vault with git or Obsidian Sync. Notes with confidential data should stay out of any folder you point a cloud AI at.
 
 ---
 
@@ -515,7 +446,7 @@ Inside Claude Code you can then just ask: *"Is there a skill for making publicat
 | **obra/superpowers** | Disciplined dev workflow: brainstorming → writing plans → TDD → systematic debugging | `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace` |
 | **find-skills** (vercel-labs) | Search and install skills from skills.sh | see above |
 | **humanizer** (blader) | Remove AI-writing tells from prose | see [Part 6](#6c-humanizer-remove-ai-writing-tells) |
-| **obsidian-skills** (kepano) | Obsidian Markdown, Bases, Canvas | `npx skills add kepano/obsidian-skills` |
+| **obsidian-skills** (kepano) | If you keep notes in [Obsidian](https://obsidian.md): teaches the agent Obsidian Markdown (wikilinks, callouts), Bases, and Canvas | `npx skills add kepano/obsidian-skills` |
 | **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | Large (100+ skills): install only what you need, e.g. `npx skills add K-Dense-AI/claude-scientific-skills --skill scanpy` |
 | **nature-skills** | Academic workflow: literature search, paper reading, reference verification, polishing, reviewer responses, figures | `git clone https://github.com/Yuan1z0825/nature-skills` |
 | **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 6a](#6a-statgen-writing-style-write-like-the-lab) |
@@ -739,7 +670,7 @@ It can also **learn a template** from a deck you like (e.g., a previous lab meet
 
 ### Tips
 
-- Feed it **MarkItDown output** ([Part 1a](#1a-markitdown-any-file-to-markdown)) for cleaner structure.
+- Feed it **MarkItDown output** ([Part 1](#1-markitdown-any-file-to-markdown)) for cleaner structure.
 - Check every number and figure on the slides against the paper. Layout tools still make mistakes.
 - Use the official `hugohe3` repo. Several copies with the same name exist on GitHub.
 
@@ -823,7 +754,6 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 |------------|-----|------------------|
 | Get better results from any prompt | Altitude / Depth / Range | "Goal is X. What would the best person use? Use it. Verify." |
 | Give AI a PDF/Word/PPT cheaply | MarkItDown | `markitdown paper.pdf -o paper.md` |
-| Build a knowledge base AI can query | Obsidian | `cd ~/vault && claude` |
 | Plan a non-trivial change | OpenSpec | `/opsx:propose` → review → `/opsx:apply` → `/opsx:archive` |
 | Get an unbiased quality check | Codex scoring | `/codex:adversarial-review <rubric>` or `codex exec --sandbox read-only` |
 | Continue tomorrow / hand to a labmate | handoff.md | `/handoff` → next session: "Read handoff.md and continue" |
@@ -849,7 +779,7 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 ## References
 
 - MarkItDown: <https://github.com/microsoft/markitdown>
-- Obsidian: <https://obsidian.md> · kepano/obsidian-skills: <https://github.com/kepano/obsidian-skills>
+- kepano/obsidian-skills (for Obsidian users): <https://github.com/kepano/obsidian-skills>
 - OpenSpec: <https://github.com/Fission-AI/OpenSpec> · docs: <https://openspec.dev/docs/getting-started>
 - Codex plugin for Claude Code: <https://github.com/openai/codex-plugin-cc> · Codex CLI: <https://github.com/openai/codex>
 - Claude Code skills docs: <https://docs.anthropic.com/en/docs/claude-code/skills> · anthropics/skills: <https://github.com/anthropics/skills>

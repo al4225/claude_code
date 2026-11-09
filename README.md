@@ -51,8 +51,8 @@ claude_code/
 - **Main User Guide**: `code/wiki/Claude_Code_User_Guide.md` - Complete guide from installation to advanced usage
 - **Slash Commands**: `code/wiki/slash_commands_reference.md` - All available slash commands
 - **Best Practices**: `code/wiki/best_practices.md` - Query formats and usage recommendations
-- **AI Research Toolkit (Lab meeting 11/9)**: `code/wiki/AI_Research_Toolkit.md` - Prompting (Altitude/Depth/Range), MarkItDown, Obsidian, OpenSpec, Codex independent scoring, handoff.md, skills, writing tools, PPT Master, StatGen tips
-- **Hands-on examples**: `examples/openspec_demo/` (OpenSpec, a real spec-driven change + one to try) and `examples/obsidian_vault/` (Obsidian knowledge base with example outputs)
+- **AI Research Toolkit (Lab meeting 11/9)**: `code/wiki/AI_Research_Toolkit.md` - Prompting (Altitude/Depth/Range), MarkItDown, OpenSpec, Codex independent scoring, handoff.md, skills, writing tools, PPT Master, StatGen tips
+- **Hands-on examples**: `examples/openspec_demo/` (OpenSpec, a real spec-driven change + one to try)
 - **Quick Reference**: `cheatsheet.txt` - One-page quick reference
 
 ## Testing Claude Code Features
