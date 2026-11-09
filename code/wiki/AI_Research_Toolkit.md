@@ -855,15 +855,6 @@ Inside Claude Code you can then just ask: *"Is there a skill for making publicat
 | Check citations are real | nature-ref-verifier | "Verify every reference in…" |
 | Paper → slides | scientific-slides | `/scientific-slides` "20-min journal club as PPTX from paper.pdf" |
 
-## Your First Week
-
-1. **Day 1:** Re-write one prompt you use often with Altitude / Depth / Range. Compare the outputs.
-2. **Day 2:** `pip install 'markitdown[all]'`; convert the 5 papers you're reading now.
-3. **Day 3:** Install `find-skills` and `humanizer`; get `statgen-writing-style` from Gao.
-4. **Day 4:** Add an HPC + data-handling `CLAUDE.md` to your main project ([§7.1](#71-put-hpc-rules-in-claudemd)).
-5. **Day 5:** End a real session with `/handoff`, start the next one from it. Score one piece of work with Codex.
-6. **Next big change:** try OpenSpec end to end.
-
 ---
 
 ## References
