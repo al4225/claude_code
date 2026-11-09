@@ -188,7 +188,7 @@ Then do it, and verify it with (4).
 
 - Original essay: Felix Rieseberg, *How to be more ambitious: A tutorial for humans with models* (Oct 13, 2026). <https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/>
 - About the author: <https://felixrieseberg.com>
-- Chinese write-ups translate the terms as 高度 / 深度 / 广度 (Altitude / Depth / Range); this page uses the original English terms.
+- Chinese summary (WeChat official account article): <https://www.woshipm.com/ai/6479197.html>
 
 ---
 
