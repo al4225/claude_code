@@ -138,7 +138,17 @@ Second example, validating results:
 
 **Rule 1: bring in several disciplines, including someone whose job is to break the result.** Felix: *"For production quality, I'd bring in an analyst, a journalist, and an editor"*, then *"a short seller and a forensic accountant"* as the red team. Ask each to **do** their job, not to role-play.
 
-**Rule 2: replace the nouns with verbs** (a trick he credits to *The Art of Innovation*). "Write a QQ-plot script" names an artifact. "Convince reviewers the test is calibrated" names an effect, and that leaves room for solutions you didn't think of.
+**Rule 2: replace the nouns with verbs** (a trick he credits to *The Art of Innovation*). A noun fixes the format before you've thought about the goal. If you think "quarterly review", all you picture is a slide deck. Felix's verb version describes what the review has to *do*: *"getting busy people to believe a story about cause and effect, and to decide under uncertainty, in 30 minutes."* That sentence opens up options a deck template never would: lead with the decision, show the causal evidence, put the uncertainty up front.
+
+The same move in our work:
+
+| Noun (format fixed) | Verb (what it must achieve) |
+|---|---|
+| "a lab-meeting deck" | "in 15 minutes, get people who don't know my method to understand why the old model fails here, believe the new result, and tell me what's missing" |
+| "a QQ-plot script" | "convince reviewers the test is calibrated under the null" |
+| "a Methods section" | "let someone reproduce every number in the paper without emailing us" |
+
+Give Claude the verb version and it can propose formats you didn't think of.
 
 StatGen example:
 
