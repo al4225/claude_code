@@ -477,7 +477,7 @@ Gao shared a skill that encodes the **Wang group writing style**, derived from t
 - **Use sparingly:** "notably", "importantly", "novel".
 - **Quantitative, no hedging adverbs:** *"reduced this 3.1-fold"*, not *"reduced this quite substantially"*.
 
-**Install:** Claude app → Customize → Skills → "+" (upload `statgen-writing-style/SKILL.md`), or drop it into `~/.claude/skills/statgen-writing-style/` for Claude Code. Ask Gao or check the lab org skills if you don't have it.
+**Install:** nothing to do. It is in our Claude Teams org skills, so it is available automatically in claude.ai and in Claude Code (where it appears as `anthropic-skills:statgen-writing-style`; start a new session if you don't see it yet).
 
 **Use:**
 
