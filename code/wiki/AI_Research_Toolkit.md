@@ -12,9 +12,10 @@ flowchart LR
     B --> C["2. Plan<br/>OpenSpec"]
     C --> D["3. Verify<br/>Codex independent score"]
     D --> E["4. Hand off<br/>handoff.md"]
-    E --> F["5. Reuse<br/>Skills · find-skills"]
-    F --> G["6. Write<br/>statgen style · defensive · Humanizer"]
-    G --> H["7. Present<br/>scientific-slides"]
+    E --> G["5. Write<br/>statgen style · defensive · Humanizer"]
+    G --> H["6. Present<br/>scientific-slides"]
+    H --> I["7. StatGen tips"]
+    I --> F["8. Reuse<br/>Skills · find-skills"]
 ```
 
 ---
@@ -28,11 +29,11 @@ flowchart LR
 | 2 | [Plan](#2-openspec-spec-driven-development) | OpenSpec | Agree on a written spec before AI writes code |
 | 3 | [Verify](#3-codex-review-independent-scoring) | Codex independent scoring | A second model scores the work against a rubric |
 | 4 | [Continuity](#4-handoffmd-never-lose-context) | `handoff.md` | One file that lets a new session pick up where the last one stopped |
-| 5a | [Reuse](#5a-make-it-a-skill) | Make it a skill | Turn a good session into a `/command` |
-| 5b | [Reuse](#5b-find-skills--top-skills) | find-skills, top skills | Use skills other people already wrote |
-| 6 | [Writing](#6-writing) | statgen-writing-style · defensive writing · Humanizer · ref verification | Write in lab style, stop GPT from watering down claims, sound human, cite real papers |
-| 7 | [Present](#7-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) | scientific-slides | Papers → lab-style talk as Beamer/PDF or **editable** PPTX |
-| 8 | [StatGen tips](#8-practical-tips-for-statgen-research) | HPC, big files, simulation checks, DUAs | Lessons from using AI on real genetics projects |
+| 5 | [Writing](#5-writing) | statgen-writing-style · defensive writing · Humanizer · ref verification | Write in lab style, stop GPT from watering down claims, sound human, cite real papers |
+| 6 | [Present](#6-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) | scientific-slides | Papers → lab-style talk as Beamer/PDF or **editable** PPTX |
+| 7 | [StatGen tips](#7-practical-tips-for-statgen-research) | HPC, big files, simulation checks, DUAs | Lessons from using AI on real genetics projects |
+| 8a | [Reuse](#8a-make-it-a-skill) | Make it a skill | Turn a good session into a `/command` |
+| 8b | [Reuse](#8b-find-skills--top-skills) | find-skills, top skills | Use skills other people already wrote |
 
 ---
 
@@ -166,7 +167,7 @@ StatGen example:
 
 ### Always: verify outside the model
 
-*"Do not ask the model to judge itself."* The best check is *"a tool the model can run to get feedback immediately"*: tests, a simulation with known truth, a held-out dataset, or a different model reviewing the work (see [Part 3](#3-codex-review-independent-scoring) and [8.3](#83-validate-statistical-code-with-simulation)). Write the check into the prompt itself, as in item (4) of the depth prompt.
+*"Do not ask the model to judge itself."* The best check is *"a tool the model can run to get feedback immediately"*: tests, a simulation with known truth, a held-out dataset, or a different model reviewing the work (see [Part 3](#3-codex-review-independent-scoring) and [7.3](#73-validate-statistical-code-with-simulation)). Write the check into the prompt itself, as in item (4) of the depth prompt.
 
 ### One template that combines all three
 
@@ -396,7 +397,7 @@ Claude writes → Codex scores (rubric) → Claude fixes BLOCKING → Codex re-s
 - **Don't enable auto-review on every edit.** It burns quota in an endless loop. Score at milestones (after the plan, after implementation, before PR).
 - Scores are a signal, not ground truth. Read the blocking items yourself.
 - **On our HPC, Codex's sandbox fails** (`bwrap: pivot_root: Invalid argument`): it can't run `git diff` or tests, and on some nodes can't even read files, so it returns `OVERALL: N/A`. Fix: put the files in the prompt yourself (see the HPC variant under Option B) and run the tests yourself.
-- **For prose, don't loop "rewrite until the AI reviewer score goes up".** AI reviewers reward hedging, and repeated review → revise rounds make GPT retract more and more of your claims (see [6b](#6b-defensive-writing-dont-let-gpt-water-down-your-claims)). Use the score to *find* issues; fix them yourself.
+- **For prose, don't loop "rewrite until the AI reviewer score goes up".** AI reviewers reward hedging, and repeated review → revise rounds make GPT retract more and more of your claims (see [6b](#5b-defensive-writing-dont-let-gpt-water-down-your-claims)). Use the score to *find* issues; fix them yourself.
 
 ---
 
@@ -459,111 +460,11 @@ Even simpler: this repo ships a ready-made skill at [`skills/handoff/SKILL.md`](
 
 ---
 
-## 5a. Make It a Skill
-
-### The idea
-
-If you have typed the same long instructions more than twice, make them a **skill**. A skill is a folder with a `SKILL.md` file: a name, a description (which tells the AI *when* to use it), and the instructions. Claude loads it automatically when relevant, or you call it as `/skill-name`.
-
-Example in this repo: [`skills/handoff/`](../../skills/handoff/SKILL.md).
-
-### Where skills live
-
-| Location | Scope |
-|----------|-------|
-| `~/.claude/skills/<name>/SKILL.md` | You, every project |
-| `<repo>/.claude/skills/<name>/SKILL.md` | Everyone who clones the repo (shared lab conventions) |
-| Plugin / marketplace | Distributed to others via `/plugin install` |
-
-### Minimal `SKILL.md`
-
-```markdown
----
-name: qc-sumstats
-description: QC GWAS summary statistics before fine-mapping or colocalization. Use when the user
-  provides a sumstats file or asks to harmonize / QC GWAS results.
----
-
-# Summary statistics QC
-
-1. Detect columns (CHR, POS, A1, A2, BETA/OR, SE, P, N, EAF). Ask if ambiguous.
-2. Check genome build (compare 20 known SNP positions against hg19/hg38).
-3. Remove: duplicated variants, strand-ambiguous A/T and C/G SNPs with 0.4 < EAF < 0.6, INFO < 0.8.
-4. Convert OR → log(OR); compute Z = BETA/SE; flag |Z| inconsistent with P.
-5. Write <input>.qc.tsv.gz and a qc_report.md with counts removed at each step.
-Never load the full file into context; use zcat | head and awk/R/Python scripts.
-```
-
-### The fastest way: let AI write it
-
-At the end of a session that went well:
-
-```
-That workflow worked. Turn what we just did into a reusable skill in ~/.claude/skills/<name>/.
-Generalize the file paths into arguments, keep the checks we found necessary, and include the
-pitfalls we hit.
-```
-
-Or use Anthropic's **skill-creator** skill, which interviews you, drafts the skill, and can test it:
-
-```
-/skill-creator Create a skill for running SuSiE-RSS fine-mapping on one LD block with our lab defaults.
-```
-
-### Tips
-
-- **The description is the trigger.** Write it as "Use when…" with the words people actually type.
-- Keep `SKILL.md` short. Put long references in separate files in the same folder and say *when* to read them.
-- Put lab-wide skills in a shared repo so improvements reach everyone.
-
----
-
-## 5b. find-skills & Top Skills
-
-### find-skills: search before you write
-
-[skills.sh](https://skills.sh) is an open directory and leaderboard of agent skills, with an `npx skills` CLI. The **find-skills** skill lets your agent search it for you.
-
-```bash
-# Install the finder (into the current project's .claude/skills; add -g for global)
-npx skills add vercel-labs/skills --skill find-skills
-
-# Or search yourself
-npx skills find "single cell"
-npx skills find "pr review"
-
-# Install any skill: owner/repo, or owner/repo@skill
-npx skills add blader/humanizer
-```
-
-Inside Claude Code you can then just ask: *"Is there a skill for making publication-quality matplotlib figures? Find and install the best one."*
-
-### Skills worth knowing
-
-| Skill / collection | What it does | Install |
-|--------------------|--------------|---------|
-| **anthropics/skills** | Official: `pdf`, `docx`, `pptx`, `xlsx`, `skill-creator`, `frontend-design` | `/plugin marketplace add anthropics/skills` then `/plugin install document-skills@anthropic-agent-skills` (and/or `example-skills@anthropic-agent-skills`) |
-| **obra/superpowers** | Disciplined dev workflow: brainstorming → writing plans → TDD → systematic debugging | `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace` |
-| **find-skills** (vercel-labs) | Search and install skills from skills.sh | see above |
-| **humanizer** (blader) | Remove AI-writing tells from prose | see [Part 6](#6c-humanizer-remove-ai-writing-tells) |
-| **obsidian-skills** (kepano) | If you keep notes in [Obsidian](https://obsidian.md): teaches the agent Obsidian Markdown (wikilinks, callouts), Bases, and Canvas | `npx skills add kepano/obsidian-skills` |
-| **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | Large (100+ skills): install only what you need, e.g. `npx skills add K-Dense-AI/claude-scientific-skills --skill scanpy` |
-| **nature-skills** | Academic workflow: literature search, paper reading, reference verification, polishing, reviewer responses, figures | `git clone https://github.com/Yuan1z0825/nature-skills` |
-| **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 6a](#6a-statgen-writing-style-write-like-the-lab) |
-| **scientific-slides** (lab) | Lab-style talks as Beamer/PDF or editable PPTX | Claude Teams org skill; see [Part 7](#7-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) |
-
-### Tips
-
-- **Read a skill before installing it.** A skill is a set of instructions your agent will follow, possibly with scripts. Prefer well-known authors and check the repo.
-- More skills is not better. Each skill's description takes up context. Install what you use, and remove the rest.
-
----
-
-## 6. Writing
+## 5. Writing
 
 Writing is where AI helps most and also where it hurts most if used naively. Use these in order: **draft in lab style → keep claims calibrated (no AI over-hedging) → make it sound human → verify every reference**.
 
-### 6a. statgen-writing-style: Write Like the Lab
+### 5a. statgen-writing-style: Write Like the Lab
 
 Gao shared a skill that encodes the **Wang group writing style**, derived from the SuSiE, mvSuSiE, ColocBoost, SuSiE-Ann, jeTWAS, and fSuSiE papers. It applies to manuscripts, figure legends, supplementary notes, Specific Aims, and response letters.
 
@@ -589,7 +490,7 @@ that isn't supported by a figure or table we have.
 Review my Introduction against statgen-writing-style. List violations with line references; don't rewrite yet.
 ```
 
-### 6b. Defensive Writing: Don't Let GPT Water Down Your Claims
+### 5b. Defensive Writing: Don't Let GPT Water Down Your Claims
 
 **What it is.** When GPT models revise a paper, they tend to **narrow, qualify, or even retract the authors' claims without any support in the source material**. A recent study calls this *defensive writing*: writing for an imagined reviewer instead of for the evidence ([Liao et al., arXiv:2610.11355](https://arxiv.org/abs/2610.11355)). This is different from real caution, which points to a limitation that actually exists in your data.
 
@@ -707,7 +608,7 @@ Then **you** decide: keep the warranted changes (the study found more than half 
 
 > Model note: in the study, Claude and DeepSeek added almost no ungrounded qualifications; recent GPT versions added the most. It's still worth running the check whichever model you use.
 
-### 6c. Humanizer: Remove AI-Writing Tells
+### 5c. Humanizer: Remove AI-Writing Tells
 
 > Not the same as the *Humanize* plugin in the old page (that one is for plans and PR loops).
 
@@ -724,7 +625,7 @@ npx skills add blader/humanizer
 
 Tips: run it **after** content is final, not before. Check that technical terms weren't changed for "variety" (e.g., *credible set* must stay *credible set*). It complements statgen-writing-style, it doesn't replace it.
 
-### 6d. Verify Every Reference
+### 5d. Verify Every Reference
 
 LLMs make up citations: real-looking authors, plausible titles, wrong years, fake DOIs. **Never paste an AI-generated reference list without checking it.**
 
@@ -738,11 +639,11 @@ confirm the cited paper actually supports the sentence; list any mismatches.
 
 ---
 
-## 7. scientific-slides: Talks in the Lab Style (Beamer/PDF or PPTX)
+## 6. scientific-slides: Talks in the Lab Style (Beamer/PDF or PPTX)
 
 ### What it is
 
-`scientific-slides` turns papers, manuscripts, notes, and old decks into a **scientific talk**: lab meetings, journal clubs, seminars, lectures, or several of your papers joined into one story. It started from Gao's lecture-preparation SOPs, and we extended it to output PowerPoint as well. It applies the same rules as Gao's writing style ([6a](#6a-statgen-writing-style-write-like-the-lab)), adapted for slides:
+`scientific-slides` turns papers, manuscripts, notes, and old decks into a **scientific talk**: lab meetings, journal clubs, seminars, lectures, or several of your papers joined into one story. It started from Gao's lecture-preparation SOPs, and we extended it to output PowerPoint as well. It applies the same rules as Gao's writing style ([6a](#5a-statgen-writing-style-write-like-the-lab)), adapted for slides:
 
 - **Story first.** Open with a concrete question or tension, give each slide one job, and connect papers through a shared model. Never "Paper 1 / Paper 2 / Paper 3".
 - **Models explained properly.** Show the smallest complete model, say what is observed, assumed, or estimated, and give the formula before the numbers. A new method is introduced as a change to the old model.
@@ -802,11 +703,11 @@ What happens behind the scenes, for PPTX:
 
 ---
 
-## 8. Practical Tips for StatGen Research
+## 7. Practical Tips for StatGen Research
 
 What we have learned using AI on real genetics projects on the HPC.
 
-### 8.1 Put HPC rules in `CLAUDE.md`
+### 7.1 Put HPC rules in `CLAUDE.md`
 
 The AI doesn't know your cluster. Tell it once in a project `CLAUDE.md`:
 
@@ -823,7 +724,7 @@ The AI doesn't know your cluster. Tell it once in a project `CLAUDE.md`:
 - Large outputs: write to files; print only summaries.
 ```
 
-### 8.2 Big files: inspect, don't read
+### 7.2 Big files: inspect, don't read
 
 A 5 GB VCF or a 10M-row sumstats file will flood the context (or crash the session). Ask for **summaries computed by code**:
 
@@ -832,7 +733,7 @@ Don't open the file. Write and run a script that reports: number of variants, co
 guess, % missing per column, and the first 5 rows.
 ```
 
-### 8.3 Validate statistical code with simulation
+### 7.3 Validate statistical code with simulation
 
 AI-written statistical code can *run* and still be *wrong* (sign errors, wrong variance, off-by-one in LD indexing). Always ask for a simulation check:
 
@@ -844,7 +745,7 @@ the credible sets, (2) coverage across 100 replicates is ≈ 95%, (3) under the 
 
 Simulation under known truth is the most reliable external check you have, in the same spirit as "verify externally" in [Part 0](#0-how-to-talk-to-ai-altitude-depth-range).
 
-### 8.4 Protect controlled-access data
+### 7.4 Protect controlled-access data
 
 - **Individual-level data under a DUA (dbGaP, UK Biobank, AMP-AD, ...) must not be sent to cloud AI services.** That includes pasting rows, letting the agent `cat` the files, or uploading them.
 - Safer: let the AI write code that runs **locally** and only prints aggregate summaries; share only public summary statistics or simulated data.
@@ -854,24 +755,124 @@ Simulation under known truth is the most reliable external check you have, in th
   ```
   Absolute paths need **two** leading slashes (`//path/...`); a single `/` is read as relative to the project. The rule also stops Claude from reading those files via `cat`/`head` in Bash.
 
-### 8.5 Reproducibility by default
+### 7.5 Reproducibility by default
 
 Ask for scripts, not interactive one-offs. Every AI-run analysis should leave a script, fixed seeds, recorded package versions (`sessionInfo()` / `pip freeze`), and a short note in the project log. Commit before and after each AI change so you can roll back (see [practices_RL.md](practices_RL.md) for the git rollback strategy).
 
-### 8.6 Use the skills you already have
+### 7.6 Use the skills you already have
 
 | Task | Tool |
 |------|------|
 | Literature search / reading / paper cards | nature-skills (`nature-academic-search`, `nature-reader`, `nature-paper-card`) |
 | Statistical reporting check | `nature-statistics` |
 | Figures | `nature-figure`, or the `dataviz` skill |
-| Response to reviewers | `nature-response` + [calibrated-claim prompts](#6b-defensive-writing-dont-let-gpt-water-down-your-claims) + [Codex scoring](#3-codex-review-independent-scoring) |
-| Lab meeting / journal club slides | `scientific-slides` ([Part 7](#7-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx)) |
+| Response to reviewers | `nature-response` + [calibrated-claim prompts](#5b-defensive-writing-dont-let-gpt-water-down-your-claims) + [Codex scoring](#3-codex-review-independent-scoring) |
+| Lab meeting / journal club slides | `scientific-slides` ([Part 6](#6-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx)) |
 | Long multi-day analysis | [OpenSpec](#2-openspec-spec-driven-development) for the plan + [`handoff.md`](#4-handoffmd-never-lose-context) between sessions |
 
-### 8.7 Derivations: ask for LaTeX *and* a numeric check
+### 7.7 Derivations: ask for LaTeX *and* a numeric check
 
 When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the derivation step by step in LaTeX and (2) check it numerically: finite-difference gradients, or compare the closed form against Monte Carlo. A derivation that reads well is not necessarily correct.
+
+---
+
+## 8a. Make It a Skill
+
+### The idea
+
+If you have typed the same long instructions more than twice, make them a **skill**. A skill is a folder with a `SKILL.md` file: a name, a description (which tells the AI *when* to use it), and the instructions. Claude loads it automatically when relevant, or you call it as `/skill-name`.
+
+Example in this repo: [`skills/handoff/`](../../skills/handoff/SKILL.md).
+
+### Where skills live
+
+| Location | Scope |
+|----------|-------|
+| `~/.claude/skills/<name>/SKILL.md` | You, every project |
+| `<repo>/.claude/skills/<name>/SKILL.md` | Everyone who clones the repo (shared lab conventions) |
+| Plugin / marketplace | Distributed to others via `/plugin install` |
+
+### Minimal `SKILL.md`
+
+```markdown
+---
+name: qc-sumstats
+description: QC GWAS summary statistics before fine-mapping or colocalization. Use when the user
+  provides a sumstats file or asks to harmonize / QC GWAS results.
+---
+
+# Summary statistics QC
+
+1. Detect columns (CHR, POS, A1, A2, BETA/OR, SE, P, N, EAF). Ask if ambiguous.
+2. Check genome build (compare 20 known SNP positions against hg19/hg38).
+3. Remove: duplicated variants, strand-ambiguous A/T and C/G SNPs with 0.4 < EAF < 0.6, INFO < 0.8.
+4. Convert OR → log(OR); compute Z = BETA/SE; flag |Z| inconsistent with P.
+5. Write <input>.qc.tsv.gz and a qc_report.md with counts removed at each step.
+Never load the full file into context; use zcat | head and awk/R/Python scripts.
+```
+
+### The fastest way: let AI write it
+
+At the end of a session that went well:
+
+```
+That workflow worked. Turn what we just did into a reusable skill in ~/.claude/skills/<name>/.
+Generalize the file paths into arguments, keep the checks we found necessary, and include the
+pitfalls we hit.
+```
+
+Or use Anthropic's **skill-creator** skill, which interviews you, drafts the skill, and can test it:
+
+```
+/skill-creator Create a skill for running SuSiE-RSS fine-mapping on one LD block with our lab defaults.
+```
+
+### Tips
+
+- **The description is the trigger.** Write it as "Use when…" with the words people actually type.
+- Keep `SKILL.md` short. Put long references in separate files in the same folder and say *when* to read them.
+- Put lab-wide skills in a shared repo so improvements reach everyone.
+
+---
+
+## 8b. find-skills & Top Skills
+
+### find-skills: search before you write
+
+[skills.sh](https://skills.sh) is an open directory and leaderboard of agent skills, with an `npx skills` CLI. The **find-skills** skill lets your agent search it for you.
+
+```bash
+# Install the finder (into the current project's .claude/skills; add -g for global)
+npx skills add vercel-labs/skills --skill find-skills
+
+# Or search yourself
+npx skills find "single cell"
+npx skills find "pr review"
+
+# Install any skill: owner/repo, or owner/repo@skill
+npx skills add blader/humanizer
+```
+
+Inside Claude Code you can then just ask: *"Is there a skill for making publication-quality matplotlib figures? Find and install the best one."*
+
+### Skills worth knowing
+
+| Skill / collection | What it does | Install |
+|--------------------|--------------|---------|
+| **anthropics/skills** | Official: `pdf`, `docx`, `pptx`, `xlsx`, `skill-creator`, `frontend-design` | `/plugin marketplace add anthropics/skills` then `/plugin install document-skills@anthropic-agent-skills` (and/or `example-skills@anthropic-agent-skills`) |
+| **obra/superpowers** | Disciplined dev workflow: brainstorming → writing plans → TDD → systematic debugging | `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace` |
+| **find-skills** (vercel-labs) | Search and install skills from skills.sh | see above |
+| **humanizer** (blader) | Remove AI-writing tells from prose | see [Part 5c](#5c-humanizer-remove-ai-writing-tells) |
+| **obsidian-skills** (kepano) | If you keep notes in [Obsidian](https://obsidian.md): teaches the agent Obsidian Markdown (wikilinks, callouts), Bases, and Canvas | `npx skills add kepano/obsidian-skills` |
+| **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | Large (100+ skills): install only what you need, e.g. `npx skills add K-Dense-AI/claude-scientific-skills --skill scanpy` |
+| **nature-skills** | Academic workflow: literature search, paper reading, reference verification, polishing, reviewer responses, figures | `git clone https://github.com/Yuan1z0825/nature-skills` |
+| **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 5a](#5a-statgen-writing-style-write-like-the-lab) |
+| **scientific-slides** (lab) | Lab-style talks as Beamer/PDF or editable PPTX | Claude Teams org skill; see [Part 6](#6-scientific-slides-talks-in-the-lab-style-beamerpdf-or-pptx) |
+
+### Tips
+
+- **Read a skill before installing it.** A skill is a set of instructions your agent will follow, possibly with scripts. Prefer well-known authors and check the repo.
+- More skills is not better. Each skill's description takes up context. Install what you use, and remove the rest.
 
 ---
 
@@ -897,7 +898,7 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 1. **Day 1:** Re-write one prompt you use often with Altitude / Depth / Range. Compare the outputs.
 2. **Day 2:** `pip install 'markitdown[all]'`; convert the 5 papers you're reading now.
 3. **Day 3:** Install `find-skills` and `humanizer`; get `statgen-writing-style` from Gao.
-4. **Day 4:** Add an HPC + data-handling `CLAUDE.md` to your main project ([§8.1](#81-put-hpc-rules-in-claudemd)).
+4. **Day 4:** Add an HPC + data-handling `CLAUDE.md` to your main project ([§7.1](#71-put-hpc-rules-in-claudemd)).
 5. **Day 5:** End a real session with `/handoff`, start the next one from it. Score one piece of work with Codex.
 6. **Next big change:** try OpenSpec end to end.
 
