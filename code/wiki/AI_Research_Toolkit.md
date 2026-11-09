@@ -42,11 +42,10 @@ flowchart LR
 
 [Felix Rieseberg](https://felixrieseberg.com) works on Claude at Anthropic, where he has led engineering for Claude.ai, Claude Cowork, and the Claude Code desktop app. He previously worked at Notion, Stripe, Slack, and Microsoft, and co-maintains Electron. His essay [*How to be more ambitious: A tutorial for humans with models*](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/) (Oct 13, 2026) argues that **the bottleneck is usually how little we ask for, not what the model can do.**
 
-He names four kinds of ambition:
+He focuses on three kinds of ambition:
 
 | Kind | Meaning | Short version |
 |------|---------|---------------|
-| **Speed** | The same work in less time | Everyone already does this. He skips it |
 | **Altitude** | Go up in abstraction: ask for the outcome, not the task | *"What's the goal beyond the goal?"* |
 | **Depth** | Do the task the way a field-leading expert actually does it | Expert **methods and tools**, not expert vocabulary |
 | **Range** | Draw on several fields, not just the obvious one | Bring in other disciplines; describe verbs, not nouns |
