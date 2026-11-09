@@ -40,48 +40,139 @@ flowchart LR
 
 ### Who is Felix, and what is the idea
 
-[Felix Rieseberg](https://felixrieseberg.com) works on Claude at Anthropic, where he has led engineering for Claude.ai, Claude Cowork, and the Claude Code desktop app. He previously worked at Notion, Stripe, Slack, and Microsoft, and co-maintains Electron. In his essay [*How to be more ambitious: A tutorial for humans with models*](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/) (Oct 13, 2026), he argues that most people under-use AI because they ask for too little. He names four kinds of ambition: **Speed** (the same work in less time, which he skips as already well understood), **Altitude**, **Depth**, and **Range**.
+[Felix Rieseberg](https://felixrieseberg.com) works on Claude at Anthropic, where he has led engineering for Claude.ai, Claude Cowork, and the Claude Code desktop app. He previously worked at Notion, Stripe, Slack, and Microsoft, and co-maintains Electron. His essay [*How to be more ambitious: A tutorial for humans with models*](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/) (Oct 13, 2026) argues that **the bottleneck is usually how little we ask for, not what the model can do.**
 
-On role prompts ("You are a world-class geneticist…"), he writes: *"When prompted to act like a professional, models often switch vocabulary without actually switching methods."* His advice: *"Don't ask the model to write like a short seller, ask it to do what a short seller does."*
+He names four kinds of ambition:
 
-| Direction | Instead of… | Do this |
-|-----------|-------------|---------|
-| **Altitude**: go up in abstraction | Describing the individual *task* ("fix this one crash") | Describe the *outcome* ("keep the app crash-free"). Give it the materials and let it reproduce, fix, and verify on its own |
-| **Depth**: do what a field-leading expert does | "Act as an expert" | Use his meta-prompt: *"I want a deeper version of this task, not a bigger one."* First list what a top professional would do that I'm not asking for, the rawest material they'd start from, the methods and tools they'd use, and what (other than you or me) would show the result is right. Then rewrite my request to ask for exactly that |
-| **Range**: draw on several fields | Staying inside the field the task seems to belong to | Ask which other fields have solved a similar problem, and borrow their methods. His example uses an analyst, an investigative journalist, and a short seller on the same question |
+| Kind | Meaning | Short version |
+|------|---------|---------------|
+| **Speed** | The same work in less time | Everyone already does this. He skips it |
+| **Altitude** | Go up in abstraction: ask for the outcome, not the task | *"What's the goal beyond the goal?"* |
+| **Depth** | Do the task the way a field-leading expert actually does it | Expert **methods and tools**, not expert vocabulary |
+| **Range** | Draw on several fields, not just the obvious one | Bring in other disciplines; describe verbs, not nouns |
 
-The rule that goes with all three: **verify externally**. In his words, *"Do not ask the model to judge itself."* Run the code, check results on held-out or simulated data, or have a different model review it (see [Part 3](#3-codex-review-independent-scoring)).
+Two things make all three work:
 
-### StatGen examples
+- **Role prompts don't.** *"When prompted to act like a professional, models often switch vocabulary without actually switching methods."* "You are a world-class statistical geneticist…" gets you the jargon, not the workflow. *"Don't ask the model to write like a short seller, ask it to do what a short seller does."*
+- **The model needs a computer.** These approaches require a model that can run code, install software, and touch real data. For us that means Claude Code on the HPC, not a chat window with pasted text.
 
-**Altitude**
+---
+
+### 1) Altitude: ask for the goal beyond the goal
+
+**Rule 1: describe the outcome, not the next step.** Felix went from asking Claude to fix single crashes to asking it to *"simply keep our apps crash-free."*
+
+**Rule 2: ask for a target that sounds unreasonable, and say it is reasonable.** *"You need your website to load in 5s instead of 10s? Ask for 200ms."* Then *"reiterate that it's very much solvable, it just needs to keep going."* Models often stop at the first improvement and report success. A far target makes them change the approach instead of tuning the old one.
+
+StatGen example:
+
+```diff
+- The fine-mapping loop over 20,000 genes takes 3 days. Can you speed it up?
++ Goal: run fine-mapping for all 20,000 genes in under 1 hour on our cluster, with
++ results identical to the current version (PIPs within 1e-6 on a 200-gene test set).
++ This is very much solvable. Profile first, find where the time actually goes
++ (I/O? LD loading? the R loop? single-threaded BLAS?), fix the biggest cost, re-measure,
++ and keep going until you hit the target or can show with numbers what blocks it.
+```
+
+Second example, one level higher:
 
 ```diff
 - Fix the bug in susie_wrapper.R line 120.
-+ Our fine-mapping pipeline sometimes returns empty credible sets on chr6 (MHC).
-+ Goal: the pipeline gives sensible credible sets on every LD block, or fails loudly with a clear reason.
-+ Here are the logs, the input for one failing block, and the LD matrix.
-+ Reproduce the failure, find the root cause, fix it, and add a regression test.
++ Our pipeline sometimes returns empty credible sets on chr6 (MHC).
++ Goal: every LD block gives sensible credible sets, or fails loudly with a clear reason.
++ Here are the logs, one failing block, and its LD matrix. Reproduce the failure,
++ find the root cause, fix it, and add a regression test.
 ```
 
-**Depth**
+---
+
+### 2) Depth: make it use the expert's real tools
+
+**Felix's copy-paste depth prompt.** Put it in front of any task where you want the expert-level version:
+
+```text
+I want a deeper version of this task, not a bigger one. Before rewriting it:
+(1) say what a top professional in this field would do here that I'm not asking for;
+(2) name the rawest material they would start from instead of what has already been digested for me;
+(3) name the specific methods and tools they would use;
+(4) say what, other than you or me, would show the result is right.
+Then rewrite my prompt to ask for exactly that.
+```
+
+**Rule: if it answers with a markdown table, send it back.** *"When Claude reaches for markdown tables, insist on the use of databases and statistical models."* A table of numbers you pasted is a summary, not an analysis. Insist on real data stores (a DuckDB/SQLite database, or the actual summary-statistics files), proper regression models with covariates, and causal-inference methods with sensitivity analyses. **You don't need to know which methods the experts use.** Item (3) of the prompt makes Claude name them, and it usually knows them well.
+
+StatGen example:
+
+```diff
+- You are an expert in statistical genetics. Is our eQTL signal enriched in brain?
+- Summarize the attached table.
++ I want a deeper version of this task, not a bigger one. [Felix's 4 questions above]
++ Task: is the genetic signal for our trait enriched in brain-specific regulation?
+```
+
+What a good answer to the 4 questions looks like (illustrative):
+
+| Question | Typical answer |
+|---|---|
+| (1) What would a top professional do that I'm not asking for? | Test enrichment formally against a baseline model, not by eye. Check that it isn't driven by LD, gene size, or MAF. Compare against other tissues |
+| (2) Rawest material | Full GWAS summary statistics and tissue-specific annotations, not a table of top hits |
+| (3) Methods and tools | Stratified LD score regression with the baseline-LD model; MAGMA gene-property analysis; colocalization at top loci; Mendelian randomization with sensitivity analyses (MR-Egger, weighted median) if a causal claim is wanted; results stored in a DuckDB database, not in markdown |
+| (4) Outside evidence it's right | Null annotations and shuffled tissues give no enrichment; simulated traits with known enrichment are recovered; results replicate in an independent GWAS |
+
+Then Claude rewrites your prompt along those lines, and you run that.
+
+Second example, validating results:
 
 ```diff
 - You are an expert in colocalization. Check my coloc results.
 + Before doing anything, list what a top statistical geneticist would check when validating
-+ colocalization results: LD mismatch between GWAS and eQTL panels, allele flips, sample overlap,
-+ prior sensitivity, multiple causal variants, etc., and the tools they would use for each.
-+ Then run those checks on results/coloc_*.tsv and report which ones pass or fail.
++ colocalization results (LD mismatch between GWAS and eQTL panels, allele flips, sample
++ overlap, prior sensitivity, multiple causal variants...) and the tool for each.
++ Then run those checks on results/coloc_*.tsv and report which pass or fail, with evidence.
 ```
 
-**Range**
+---
+
+### 3) Range: borrow other fields' methods
+
+**Rule 1: bring in several disciplines, including someone whose job is to break the result.** Felix: *"For production quality, I'd bring in an analyst, a journalist, and an editor"*, then *"a short seller and a forensic accountant"* as the red team. Ask each to **do** their job, not to role-play.
+
+**Rule 2: replace the nouns with verbs** (a trick he credits to *The Art of Innovation*). "Write a QQ-plot script" names an artifact. "Convince reviewers the test is calibrated" names an effect, and that leaves room for solutions you didn't think of.
+
+StatGen example:
 
 ```diff
 - Write a plotting script for the QQ plot.
-+ I want reviewers to trust that our test is calibrated under the null.
-+ How would a statistician, a software tester, and a skeptical reviewer each try to break this claim?
-+ Use their methods (QQ plots and genomic inflation; type-I error across MAF bins; permutation;
-+ adversarial simulated nulls), then produce the evidence.
++ I want reviewers to believe our new test is calibrated under the null.
++ Attack this claim the way three different people would, then produce the evidence:
++  - a statistician: QQ plots, genomic inflation, type-I error by MAF bin and sample size;
++  - a software tester: edge cases (monomorphic SNPs, tiny n, missing genotypes) that could break it;
++  - a skeptical reviewer: permutation and adversarial nulls (population structure, relatedness)
++    designed to make it fail.
++ Report where it holds and where it doesn't.
+```
+
+---
+
+### Always: verify outside the model
+
+*"Do not ask the model to judge itself."* The best check is *"a tool the model can run to get feedback immediately"*: tests, a simulation with known truth, a held-out dataset, or a different model reviewing the work (see [Part 3](#3-codex-review-independent-scoring) and [8.3](#83-validate-statistical-code-with-simulation)). Write the check into the prompt itself, as in item (4) of the depth prompt.
+
+### One template that combines all three
+
+```text
+Goal (beyond the immediate task): <the outcome I actually want>
+Target: <a far target>. This is very much solvable; keep going until you reach it
+or can show with numbers what blocks it.
+I want a deeper version of this task, not a bigger one. Before starting:
+(1) what would a top professional in this field do that I'm not asking for;
+(2) the rawest material they would start from;
+(3) the specific methods and tools they would use (databases and statistical models,
+    not markdown tables);
+(4) what, other than you or me, would show the result is right.
+Also: which other fields have solved a similar problem, and what would they do?
+Then do it, and verify it with (4).
 ```
 
 ### References
