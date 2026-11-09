@@ -492,121 +492,83 @@ Review my Introduction against statgen-writing-style. List violations with line 
 
 ### 5b. Defensive Writing: Don't Let GPT Water Down Your Claims
 
-**What it is.** When GPT models revise a paper, they tend to **narrow, qualify, or even retract the authors' claims without any support in the source material**. A recent study calls this *defensive writing*: writing for an imagined reviewer instead of for the evidence ([Liao et al., arXiv:2610.11355](https://arxiv.org/abs/2610.11355)). This is different from real caution, which points to a limitation that actually exists in your data.
+**Problem → why it happens → how to prevent it → how to check.**
 
-**What the study found** (77 paragraphs from 20 pre-ChatGPT papers, 8 GPT versions vs. Claude / DeepSeek / Grok):
+#### 1. The problem
 
-| Finding | Number |
-|---------|--------|
-| Ungrounded qualifications added (newest GPT, result-analysis paragraphs) | ~1.3 per 100 words vs. ~0.04 in the authors' originals |
-| Author claims **retracted** in one rewrite (newest GPT vs. control models) | 7.9% vs. ≤ 1.0% |
-| Claims retracted after **one AI review → revise round** (GPT versions) | 11–25% (Claude Opus: ~1–5%) |
-| Added qualifications judged **redundant** by PhD-student checkers | 36 of 60 (3 actually wrong) |
-| Changed claims judged **warranted** | 28 of 48, so some of the softening was useful |
-| Human readers: ease of reading / perceived author certainty | 5.75 → 5.05 (1–7) / 4.35 → 3.38 (1–5); comprehension unchanged |
-| AI reviewer scores | **Higher** for hedged versions; stripping only the qualifications lowered scores ~0.8 |
-
-So the hedging makes the paper harder to read and makes you sound unsure, without making it clearer. AI reviewers *reward* it, so a "rewrite until the AI reviewer is happy" loop makes it worse every round.
-
-**What triggers it.** It depends on the prompt wording:
-
-| Prompt framing | Defensive writing |
-|----------------|-------------------|
-| "Polish this paragraph" | ≈ none (close to the original) |
-| "Make claims scientifically accurate / as strong as the evidence warrants" | Up somewhat |
-| "Revise so it holds up under peer review" | Up |
-| "Address the concerns a peer reviewer is likely to raise" | **Highest** |
-| Review → revise, repeated | Accumulates every round |
-
-**Typical patterns to watch for:**
-
-- *Retraction disguised as rigor*: "this network has better stability properties" → "we therefore **do not claim** that the proposed formulation has better stability properties"
-- *Weakened magnitude*: "outperforms the baselines by a large margin" → "achieves the highest performance"
-- *"Not-shown" sentences*: "these results **do not by themselves establish** …"
-- *Generic scoping*: "**in the evaluated settings**", "**under our assumptions**", repeated in every paragraph
-
-StatGen version of the same thing:
+When GPT revises a paper, it often **adds hedges or retracts claims that your data actually support**. It is writing for an imagined reviewer, not for the evidence. [Liao et al. (arXiv:2610.11355)](https://arxiv.org/abs/2610.11355) call this *defensive writing*.
 
 ```diff
 - ColocBoost identified 2,043 colocalized loci, 38% more than the next best method.
 + Within the settings we evaluated, ColocBoost identified 2,043 putatively colocalized loci;
-+ however, these results do not by themselves establish shared causal variants, and differences
-+ relative to other methods may depend on LD reference and prior choices.
++ however, these results do not by themselves establish shared causal variants...
 ```
 
-The numbers are the same; the hedges just make the claim sound weaker. If LD-reference sensitivity really matters, say it **once**, with the analysis that shows it, in Limitations.
+The numbers didn't change; the claim just got weaker. Real caution is different: it names a specific limitation of *your* data, says it once, and puts it in Limitations.
 
-#### Prompts that keep claims calibrated (neither overclaiming nor defensive)
+**What the study measured** (77 paragraphs from 20 papers, 8 GPT versions vs. Claude / DeepSeek / Grok):
 
-The goal is **as strong as the evidence supports, no stronger and no weaker, with the author making the call**. Two rules follow from the study: (1) keep *critique* and *rewriting* as separate steps, and (2) don't put "reviewer" or "peer review" in a rewrite prompt.
+- Newest GPT **retracted 7.9%** of author claims in a single rewrite (other models ≤ 1%). After one AI-review → revise round: **11–25%** (Claude Opus ~1–5%).
+- Readers found the hedged text **harder to read** and the authors **less certain**. Comprehension did not improve.
+- AI reviewers **scored the hedged versions higher**. So "revise until the AI reviewer is happy" makes it worse every round.
+- Not all softening was bad: more than half of the changed claims (28 of 48) were judged warranted. **The fix is for you to decide, not to ban every change.**
 
-**① Rewrite / polish: language only, claims locked**
+#### 2. What triggers it: the word "reviewer"
+
+| Prompt | Defensive writing |
+|---|---|
+| "Polish this paragraph" | ≈ none |
+| "Revise so it holds up under peer review" | More |
+| "Address the concerns a reviewer is likely to raise" | **Most** |
+| Review → revise, repeated | Accumulates every round |
+
+#### 3. How to prevent it: separate critique from rewriting
+
+**Rule:** a rewrite prompt never mentions reviewers, and a critique prompt never rewrites. You decide what to change in between.
+
+**① Rewrite: language only, claims locked**
 
 ```
 Polish this paragraph for clarity, flow, and concision. This is a language edit only.
-Rules:
-- Keep every claim at its current strength. Do not add hedges, qualifications, scope limits,
-  or "we do not claim / these results do not establish" sentences.
-- Do not remove or weaken any claim, number, or comparison.
-- If you think a claim is not supported, do NOT change it. Instead list it after the paragraph
-  as: [CLAIM] → [why you think it's unsupported] → [what evidence would support it].
+- Keep every claim, number, and comparison at its current strength.
+- Do not add hedges, scope limits, or "we do not claim / do not establish" sentences.
+- If you think a claim is unsupported, do NOT change it. List it after the paragraph as:
+  [CLAIM] → [why unsupported] → [what evidence would support it].
 ```
-
-> **We tested it** (2026-11-09, GPT via `codex exec`, 3 runs each, same ColocBoost Results paragraph ending in *"These results show that joint modeling of multiple traits improves power…"*):
->
-> | Prompt | Last sentence kept? | Defensive sentences added |
-> |--------|---------------------|---------------------------|
-> | "Revise this paragraph so that it holds up under peer review." | **0/3**: "show… improves power" became "demonstrate a higher discovery yield… under the simulated conditions" | **3/3** added "However, … requires matched false-positive rates / ablation", or "these comparisons do not isolate…" |
-> | Prompt ① | **3/3**, word for word | **0/3**. The same concern (joint modeling not isolated → needs an ablation) shows up as a flagged item **below** the paragraph, for you to decide |
->
-> GPT's concern is a fair one. With ① it reaches you as a flag for you to decide on, instead of being written into your paper.
 
 **② Critique: list problems, change nothing**
 
 ```
-Read the Results section. Do not rewrite anything.
-Make a table with one row per claim: claim (quoted) | supporting figure/table/number |
-verdict: overclaim / calibrated / UNDERclaim | one-line reason.
-Count underclaims (claims weaker than the evidence) as errors too.
-Only mark "overclaim" if you can point to a specific missing analysis or contradicting result.
+Read the Results section. Do not rewrite anything. One row per claim:
+claim (quoted) | supporting figure/number | overclaim / calibrated / UNDERclaim | reason.
+Underclaims count as errors too. Only mark "overclaim" if you can name the missing analysis.
 ```
 
-Asking for **underclaims** as well as overclaims is what keeps this from turning defensive.
+Then fix the real problems yourself, with a new analysis or one targeted sentence. Typical real statgen objections: LD reference mismatch · population stratification · winner's curse · GWAS–QTL sample overlap · simulations that favor your method · multiple testing across tissues.
 
-**③ Audit a draft someone (or some AI) already revised**
-
-```
-Compare original.md and revised.md sentence by sentence.
-For every claim, label it: kept / softened / retracted / strengthened.
-For every qualification that appears in revised.md but not original.md, cite the specific
-data, figure, or analysis in our paper that requires it. If none exists, mark it UNGROUNDED.
-Output the table only.
-```
-
-Then **you** decide: keep the warranted changes (the study found more than half of the changed claims were warranted) and revert the ungrounded ones.
-
-**④ Standing instruction**: put it in `CLAUDE.md`, ChatGPT custom instructions, or a project's instructions:
+**③ Make it permanent**: put this in `CLAUDE.md` or ChatGPT custom instructions:
 
 ```markdown
 # Claim calibration
-- State findings directly at the strength the evidence supports. No reflexive hedging.
-- A qualification is allowed only if it names a specific limitation of OUR data or analysis
-  (e.g. "EUR-only LD reference"), and it is stated once (usually in Limitations), not repeated.
-- Never add "we do not claim…", "these results do not by themselves establish…",
-  or "in the evaluated settings" unless I ask.
+- State findings at the strength the evidence supports. No reflexive hedging.
+- A caveat must name a specific limitation of OUR data (e.g. "EUR-only LD reference"), stated once.
 - Never silently weaken or delete a claim. Flag it and let me decide.
 ```
 
-**When you do want reviewer-style criticism** (e.g., before submission or for a response letter), use a reviewer prompt **only to produce a list of objections**, not to rewrite. Fix the real ones yourself with new analyses or targeted wording. Typical real statgen objections: LD reference mismatch · population stratification · winner's curse · sample overlap between GWAS and QTL · simulation settings too favorable to your method · unfair baseline settings · multiple testing across tissues/contexts.
+**We tested ①** (GPT via `codex exec`, 3 runs each, same ColocBoost Results paragraph):
 
-**Quick self-check after any AI edit:**
+| Prompt | Conclusion kept | Defensive sentences added |
+|---|---|---|
+| "Revise … so that it holds up under peer review" | 0/3 | 3/3 ("However, … requires …", "do not isolate …") |
+| ① | **3/3** word for word | **0/3**. The same concern appeared as a flag **below** the paragraph, for the author to decide |
 
-- [ ] Did any number, effect size, or "X-fold / outperforms" comparison get weaker?
-- [ ] Any new "we do not claim", "do not establish", "may", "potentially", "in the evaluated settings"?
-- [ ] Is every remaining caveat tied to a named limitation, and stated only once?
-- [ ] Did I, not the model, decide each softening?
+#### 4. Check after any AI edit
 
-> Model note: in the study, Claude and DeepSeek added almost no ungrounded qualifications; recent GPT versions added the most. It's still worth running the check whichever model you use.
+- [ ] Did any number, effect size, or "outperforms" get weaker?
+- [ ] Any new "we do not claim", "do not establish", "may", "in the evaluated settings"?
+- [ ] Does every remaining caveat name a real limitation, stated only once?
+
+Already have a revised draft? Ask: *"Compare original.md and revised.md. Label each claim kept / softened / retracted. For every new qualification, cite the data that requires it, or mark it UNGROUNDED."* Then revert the ungrounded ones.
 
 ### 5c. Humanizer: Remove AI-Writing Tells
 
