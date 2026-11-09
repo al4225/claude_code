@@ -2,13 +2,13 @@
 
 *Lab meeting, Nov 9, 2026*
 
-This page continues [Claude_Code_User_Tips.md](Claude_Code_User_Tips.md). That page covers terminal setup, the Codex plugin, Humanize, SLURM Monitor, and Remote Control. This page covers **how to work with AI across a research project**, from feeding it papers to shipping a figure-ready manuscript and slide deck.
+This page continues [Claude_Code_User_Tips.md](Claude_Code_User_Tips.md). That page covers terminal setup, the Codex plugin, Humanize, and Remote Control. This page covers **how to work with AI across a research project**, from feeding it papers to shipping a figure-ready manuscript and slide deck.
 
 The sections follow the order of a real project. Read top to bottom the first time; after that, use the [cheat sheet](#cheat-sheet).
 
 ```mermaid
 flowchart LR
-    A["0. Prompt well<br/>Height · Depth · Breadth"] --> B["1. Feed context<br/>MarkItDown · Obsidian"]
+    A["0. Prompt well<br/>Altitude · Depth · Range"] --> B["1. Feed context<br/>MarkItDown · Obsidian"]
     B --> C["2. Plan<br/>OpenSpec"]
     C --> D["3. Verify<br/>Codex independent score"]
     D --> E["4. Hand off<br/>handoff.md"]
@@ -23,7 +23,7 @@ flowchart LR
 
 | # | Part | Tool / Tip | One-line pitch |
 |---|------|-----------|----------------|
-| 0 | [How to talk to AI](#0-how-to-talk-to-ai-height-depth-breadth) | Height / Depth / Breadth | Stop saying "you are an expert in X". Give it a goal, a workflow, and an outcome |
+| 0 | [How to talk to AI](#0-how-to-talk-to-ai-altitude-depth-range) | Altitude / Depth / Range | Stop saying "you are an expert in X". Give it a goal, a workflow, and an outcome |
 | 1a | [Feed context](#1a-markitdown-any-file-to-markdown) | MarkItDown | PDF / Word / PPT / Excel → Markdown. Fewer tokens, better answers |
 | 1b | [Feed context](#1b-obsidian-a-knowledge-base-your-ai-can-read) | Obsidian | Your notes as plain Markdown that Claude can read, search, and maintain |
 | 2 | [Plan](#2-openspec-spec-driven-development) | OpenSpec | Agree on a written spec before AI writes code |
@@ -37,23 +37,25 @@ flowchart LR
 
 ---
 
-## 0. How to Talk to AI: Height, Depth, Breadth
+## 0. How to Talk to AI: Altitude, Depth, Range
 
-### The idea
+### Who is Felix, and what is the idea
 
-Felix Rieseberg (Anthropic, Claude Code desktop and Cowork) argues that most people under-use AI. The bottleneck is how much we ask for, not what the model can do. **Role-play prompts ("You are a world-class geneticist…") rarely help.** Push the prompt along three directions instead:
+[Felix Rieseberg](https://felixrieseberg.com) works on Claude at Anthropic, where he has led engineering for Claude.ai, Claude Cowork, and the Claude Code desktop app. He previously worked at Notion, Stripe, Slack, and Microsoft, and co-maintains Electron. In his essay [*How to be more ambitious: A tutorial for humans with models*](https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/) (Oct 13, 2026), he argues that most people under-use AI because they ask for too little. He names four kinds of ambition: **Speed** (the same work in less time, which he skips as already well understood), **Altitude**, **Depth**, and **Range**.
+
+On role prompts ("You are a world-class geneticist…"), he writes: *"When prompted to act like a professional, models often switch vocabulary without actually switching methods."* His advice: *"Don't ask the model to write like a short seller, ask it to do what a short seller does."*
 
 | Direction | Instead of… | Do this |
 |-----------|-------------|---------|
-| **Height**: raise the goal | Describing the *task* ("fix this one crash") | Describe the *result* you want ("make the app stop crashing"). Give it the materials and let it reproduce, fix, and verify on its own |
-| **Depth**: real expert workflow | "Act as an expert" | Ask: *"What data, tools, and methods would the best person in this field use? Use them to do this task."* The model then follows the expert's actual workflow, not just the expert's tone |
-| **Breadth**: verbs, not nouns | Naming an artifact ("write a script") | Describe the effect you want ("make it so we can rerun every figure from raw data with one command"). This leaves room for solutions from other fields |
+| **Altitude**: go up in abstraction | Describing the individual *task* ("fix this one crash") | Describe the *outcome* ("keep the app crash-free"). Give it the materials and let it reproduce, fix, and verify on its own |
+| **Depth**: do what a field-leading expert does | "Act as an expert" | Use his meta-prompt: *"I want a deeper version of this task, not a bigger one."* First list what a top professional would do that I'm not asking for, the rawest material they'd start from, the methods and tools they'd use, and what (other than you or me) would show the result is right. Then rewrite my request to ask for exactly that |
+| **Range**: draw on several fields | Staying inside the field the task seems to belong to | Ask which other fields have solved a similar problem, and borrow their methods. His example uses an analyst, an investigative journalist, and a short seller on the same question |
 
-A fourth rule that goes with these: **verify externally**. Don't let the model grade itself. Run the code, check results on held-out or simulated data, or have a different model review it (see [Part 3](#3-codex-review-independent-scoring)).
+The rule that goes with all three: **verify externally**. In his words, *"Do not ask the model to judge itself."* Run the code, check results on held-out or simulated data, or have a different model review it (see [Part 3](#3-codex-review-independent-scoring)).
 
 ### StatGen examples
 
-**Height**
+**Altitude**
 
 ```diff
 - Fix the bug in susie_wrapper.R line 120.
@@ -73,19 +75,21 @@ A fourth rule that goes with these: **verify externally**. Don't let the model g
 + Then run those checks on results/coloc_*.tsv and report which ones pass or fail.
 ```
 
-**Breadth**
+**Range**
 
 ```diff
 - Write a plotting script for the QQ plot.
 + I want reviewers to trust that our test is calibrated under the null.
-+ Propose the evidence that would convince them (QQ plots, genomic inflation, type-I error tables
-+ across MAF bins, permutation...), then produce it.
++ How would a statistician, a software tester, and a skeptical reviewer each try to break this claim?
++ Use their methods (QQ plots and genomic inflation; type-I error across MAF bins; permutation;
++ adversarial simulated nulls), then produce the evidence.
 ```
 
 ### References
 
-- Coverage of Felix's essay (Chinese): <https://www.woshipm.com/ai/6479197.html>
-- English summary: <https://fourweekmba.com/ai-a-claude-builders-4-types-of-ambition-for-working-with-ai/>
+- Original essay: Felix Rieseberg, *How to be more ambitious: A tutorial for humans with models* (Oct 13, 2026). <https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/>
+- About the author: <https://felixrieseberg.com>
+- Chinese write-ups translate the terms as 高度 / 深度 / 广度 (Altitude / Depth / Range); this page uses the original English terms.
 
 ---
 
@@ -141,6 +145,7 @@ claude mcp add markitdown -- markitdown-mcp
 
 - Equations in PDFs often come out garbled. For math-heavy papers, check the Methods section or use the arXiv LaTeX source.
 - Scanned PDFs need OCR. Check the output before relying on it.
+- **PDF tables lose their structure**: they come out as plain lines of text, not Markdown tables. Word/Excel/PPT tables convert cleanly. For a key PDF table, ask for the supplementary `.xlsx`/`.csv` instead.
 - Keep the converted `.md` next to the original so you don't convert the same file twice.
 
 ---
@@ -150,6 +155,8 @@ claude mcp add markitdown -- markitdown-mcp
 ### What it is
 
 [Obsidian](https://obsidian.md) is a note-taking app. Its "vault" is just **a folder of Markdown files on your disk**, which is exactly what Claude Code is good at reading, searching, and editing. Run `claude` inside the vault and your notes become a knowledge base for the AI.
+
+> **Hands-on example:** [`examples/obsidian_vault/`](../../examples/obsidian_vault/README.md) is a working demo vault: a `CLAUDE.md` with templates, 4 paper notes (SuSiE, SuSiE-RSS, coloc, coloc+SuSiE), concept notes, a Word file converted with MarkItDown and turned into a linked meeting note, a project with `log.md` / `decisions.md` / `handoff.md`, and **saved example answers** in `outputs/`. Open it in Obsidian, or `cd` into it and run `claude`.
 
 ### Why it matters for research
 
@@ -216,6 +223,8 @@ Give a table with pros and cons and cite the note names.
 ### What it is
 
 [OpenSpec](https://github.com/Fission-AI/OpenSpec) adds a lightweight **spec layer** between you and the AI. Before code is written, the AI writes a *proposal*, *design*, and *task list* that you review. After implementation, the change is merged into a living spec of what the system does.
+
+> **Hands-on example:** [`examples/openspec_demo/`](../../examples/openspec_demo/README.md) is a small, real Python package (`sumstats_tools`) built with OpenSpec v1.16.1. It contains **one finished change** (allele harmonization: proposed → implemented with 12 passing tests → archived into the living spec) to read, and **one pending proposal** (LD matrix check) you can implement yourself with `/opsx:apply`.
 
 ### When to use it
 
@@ -314,6 +323,18 @@ EOF
 )" > review_round1.md
 ```
 
+**HPC variant** (when Codex can't read files, see Tips): inline the files into the prompt.
+
+```bash
+codex exec --sandbox read-only "Do not run any commands; everything you need is below.
+<same rubric as above>
+
+$(for f in openspec/changes/<change>/design.md src/harmonize.py tests/test_harmonize.py; do
+    echo "=== $f"; cat "$f"; done)" > review_round1.md
+```
+
+We ran this on [`examples/openspec_demo`](../../examples/openspec_demo/) and it found a real bug that 12 passing tests missed: an A/A variant matched both "match" and "swap", so its BETA got flipped (score 6/10, 2 BLOCKING). Fixed with a regression test.
+
 Then hand it back to Claude:
 
 ```
@@ -343,6 +364,7 @@ Claude writes → Codex scores (rubric) → Claude fixes BLOCKING → Codex re-s
 - Ask for **blocking vs. non-blocking**. Otherwise you get 30 suggestions of equal weight.
 - **Don't enable auto-review on every edit.** It burns quota in an endless loop. Score at milestones (after the plan, after implementation, before PR).
 - Scores are a signal, not ground truth. Read the blocking items yourself.
+- **On our HPC, Codex's sandbox fails** (`bwrap: pivot_root: Invalid argument`): it can't run `git diff` or tests, and on some nodes can't even read files, so it returns `OVERALL: N/A`. Fix: put the files in the prompt yourself (see the HPC variant under Option B) and run the tests yourself.
 - **For prose, don't loop "rewrite until the AI reviewer score goes up".** AI reviewers reward hedging, and repeated review → revise rounds make GPT retract more and more of your claims (see [6b](#6b-defensive-writing-dont-let-gpt-water-down-your-claims)). Use the score to *find* issues; fix them yourself.
 
 ---
@@ -401,6 +423,7 @@ Even simpler: this repo ships a ready-made skill at [`skills/handoff/SKILL.md`](
 
 - The **"what did NOT work"** section is the most valuable. It stops the next session from repeating dead ends.
 - Write the handoff **before** the context is nearly full. At that point the model has already lost detail.
+- Write it **in the same session that did the work**. A new session only sees git, not the conversation, so it can't fill in "what did NOT work" or "key decisions".
 - Commit `handoff.md` with the code, so `git log` shows the history of where the project stood.
 
 ---
@@ -411,7 +434,7 @@ Even simpler: this repo ships a ready-made skill at [`skills/handoff/SKILL.md`](
 
 If you have typed the same long instructions more than twice, make them a **skill**. A skill is a folder with a `SKILL.md` file: a name, a description (which tells the AI *when* to use it), and the instructions. Claude loads it automatically when relevant, or you call it as `/skill-name`.
 
-Example already in this repo: [`skills/slurm-monitor/`](../../skills/slurm-monitor/SKILL.md) (OOM detection and auto-resubmit), and the new [`skills/handoff/`](../../skills/handoff/SKILL.md).
+Example in this repo: [`skills/handoff/`](../../skills/handoff/SKILL.md).
 
 ### Where skills live
 
@@ -488,15 +511,14 @@ Inside Claude Code you can then just ask: *"Is there a skill for making publicat
 
 | Skill / collection | What it does | Install |
 |--------------------|--------------|---------|
-| **anthropics/skills** | Official: `pdf`, `docx`, `pptx`, `xlsx`, `skill-creator`, `frontend-design` | `/plugin marketplace add anthropics/skills` |
+| **anthropics/skills** | Official: `pdf`, `docx`, `pptx`, `xlsx`, `skill-creator`, `frontend-design` | `/plugin marketplace add anthropics/skills` then `/plugin install document-skills@anthropic-agent-skills` (and/or `example-skills@anthropic-agent-skills`) |
 | **obra/superpowers** | Disciplined dev workflow: brainstorming → writing plans → TDD → systematic debugging | `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace` |
 | **find-skills** (vercel-labs) | Search and install skills from skills.sh | see above |
 | **humanizer** (blader) | Remove AI-writing tells from prose | see [Part 6](#6c-humanizer-remove-ai-writing-tells) |
 | **obsidian-skills** (kepano) | Obsidian Markdown, Bases, Canvas | `npx skills add kepano/obsidian-skills` |
-| **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | `npx skills add K-Dense-AI/claude-scientific-skills` |
+| **claude-scientific-skills** (K-Dense-AI) | Scientific packages and databases (scanpy, Biopython, PubMed, ...) | Large (100+ skills): install only what you need, e.g. `npx skills add K-Dense-AI/claude-scientific-skills --skill scanpy` |
 | **nature-skills** | Academic workflow: literature search, paper reading, reference verification, polishing, reviewer responses, figures | `git clone https://github.com/Yuan1z0825/nature-skills` |
 | **statgen-writing-style** (Gao) | Wang-group manuscript style | see [Part 6a](#6a-statgen-writing-style-write-like-the-lab) |
-| **slurm-monitor** (this repo) | SLURM OOM auto-resubmit | `skills/slurm-monitor/` |
 
 ### Tips
 
@@ -597,6 +619,15 @@ Rules:
   as: [CLAIM] → [why you think it's unsupported] → [what evidence would support it].
 ```
 
+> **We tested it** (2026-11-09, GPT via `codex exec`, 3 runs each, same ColocBoost Results paragraph ending in *"These results show that joint modeling of multiple traits improves power…"*):
+>
+> | Prompt | Last sentence kept? | Defensive sentences added |
+> |--------|---------------------|---------------------------|
+> | "Revise this paragraph so that it holds up under peer review." | **0/3**: "show… improves power" became "demonstrate a higher discovery yield… under the simulated conditions" | **3/3** added "However, … requires matched false-positive rates / ablation", or "these comparisons do not isolate…" |
+> | Prompt ① | **3/3**, word for word | **0/3**. The same concern (joint modeling not isolated → needs an ablation) shows up as a flagged item **below** the paragraph, for you to decide |
+>
+> GPT's concern is a fair one. With ① it reaches you as a flag for you to decide on, instead of being written into your paper.
+
 **② Critique: list problems, change nothing**
 
 ```
@@ -686,11 +717,11 @@ confirm the cited paper actually supports the sentence; list any mismatches.
 ```bash
 git clone https://github.com/hugohe3/ppt-master.git
 cd ppt-master
-pip install -r requirements.txt
+pip install -r requirements.txt   # Python 3.10–3.14
 claude          # run your AI tool inside the repo so it picks up the workflow
 ```
 
-Requires PowerPoint 2016+ to open and edit the output.
+Or install it as a skill: `npx skills add hugohe3/ppt-master`.
 
 ### How to use
 
@@ -700,7 +731,9 @@ motivation, model, simulation results, real-data application, limitations, discu
 Clean academic style, one key message per slide, include the main figures.
 ```
 
-Output goes to `exports/`: a native-shapes `.pptx` (edit this one) plus an `_svg.pptx` visual snapshot.
+Before generating, it proposes a **design spec** (outline, style, colors) and waits for you to confirm. Reply "confirm" or ask for changes; say "quick generation" to skip the step.
+
+Output goes to `exports/<name>_<timestamp>.pptx` (native shapes, edit this one); the per-slide SVGs are kept in `svg_final/`.
 
 It can also **learn a template** from a deck you like (e.g., a previous lab meeting deck) and reuse it, or **fill an existing `.pptx`** with new content while keeping its design.
 
@@ -752,7 +785,7 @@ plant 2 causal variants with known effects, run the method, and check (1) the ca
 the credible sets, (2) coverage across 100 replicates is ≈ 95%, (3) under the null, p-values are uniform.
 ```
 
-Simulation under known truth is the most reliable external check you have, in the same spirit as "verify externally" in [Part 0](#0-how-to-talk-to-ai-height-depth-breadth).
+Simulation under known truth is the most reliable external check you have, in the same spirit as "verify externally" in [Part 0](#0-how-to-talk-to-ai-altitude-depth-range).
 
 ### 8.4 Protect controlled-access data
 
@@ -760,8 +793,9 @@ Simulation under known truth is the most reliable external check you have, in th
 - Safer: let the AI write code that runs **locally** and only prints aggregate summaries; share only public summary statistics or simulated data.
 - Block sensitive paths with permission rules in `.claude/settings.json`:
   ```json
-  { "permissions": { "deny": ["Read(/path/to/controlled_data/**)"] } }
+  { "permissions": { "deny": ["Read(//path/to/controlled_data/**)"] } }
   ```
+  Absolute paths need **two** leading slashes (`//path/...`); a single `/` is read as relative to the project. The rule also stops Claude from reading those files via `cat`/`head` in Bash.
 
 ### 8.5 Reproducibility by default
 
@@ -771,7 +805,6 @@ Ask for scripts, not interactive one-offs. Every AI-run analysis should leave a 
 
 | Task | Tool |
 |------|------|
-| SLURM jobs dying of OOM | `/slurm-monitor` |
 | Literature search / reading / paper cards | nature-skills (`nature-academic-search`, `nature-reader`, `nature-paper-card`) |
 | Statistical reporting check | `nature-statistics` |
 | Figures | `nature-figure`, or the `dataviz` skill |
@@ -788,7 +821,7 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 
 | I want to… | Use | Command / prompt |
 |------------|-----|------------------|
-| Get better results from any prompt | Height / Depth / Breadth | "Goal is X. What would the best person use? Use it. Verify." |
+| Get better results from any prompt | Altitude / Depth / Range | "Goal is X. What would the best person use? Use it. Verify." |
 | Give AI a PDF/Word/PPT cheaply | MarkItDown | `markitdown paper.pdf -o paper.md` |
 | Build a knowledge base AI can query | Obsidian | `cd ~/vault && claude` |
 | Plan a non-trivial change | OpenSpec | `/opsx:propose` → review → `/opsx:apply` → `/opsx:archive` |
@@ -804,7 +837,7 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 
 ## Your First Week
 
-1. **Day 1:** Re-write one prompt you use often with Height / Depth / Breadth. Compare the outputs.
+1. **Day 1:** Re-write one prompt you use often with Altitude / Depth / Range. Compare the outputs.
 2. **Day 2:** `pip install 'markitdown[all]'`; convert the 5 papers you're reading now.
 3. **Day 3:** Install `find-skills` and `humanizer`; get `statgen-writing-style` from Gao.
 4. **Day 4:** Add an HPC + data-handling `CLAUDE.md` to your main project ([§8.1](#81-put-hpc-rules-in-claudemd)).
@@ -826,4 +859,4 @@ When AI derives a gradient, posterior, or ELBO update, ask it to (1) write the d
 - PPT Master: <https://github.com/hugohe3/ppt-master>
 - nature-skills: <https://github.com/Yuan1z0825/nature-skills>
 - Defensive writing in GPT models (Liao et al.): <https://arxiv.org/abs/2610.11355>
-- Felix Rieseberg on AI ambition (coverage): <https://www.woshipm.com/ai/6479197.html>
+- Felix Rieseberg, "How to be more ambitious: A tutorial for humans with models" (2026): <https://felixrieseberg.com/how-to-be-more-ambitious-a-tutorial-for-humans-with-models/>

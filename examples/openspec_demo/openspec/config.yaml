@@ -1,0 +1,45 @@
+schema: spec-driven
+
+context: |
+  Python package for GWAS summary statistics used in statistical genetics pipelines.
+  Inputs are pandas DataFrames with columns CHR, POS, A1 (effect allele), A2, BETA, SE.
+  Correctness of effect direction matters more than speed: a silent sign flip corrupts
+  downstream fine-mapping and colocalization. Prefer failing loudly over guessing.
+  Every behavior change needs a pytest test, including a simulated-data check where relevant.
+
+rules:
+  proposal:
+    - State what is out of scope
+  tasks:
+    - Include explicit test tasks for edge cases (strand-ambiguous SNPs, missing values)
+
+# Project context (optional)
+# Add only constraints that should guide OpenSpec artifacts and workflows.
+# Include constraints an agent cannot infer by reading the code.
+# Keep general project documentation and discoverable codebase facts out.
+# Example:
+#   context: |
+#     Designs and tasks must cover Windows, macOS, and Linux
+#     Write all artifacts in Spanish
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
